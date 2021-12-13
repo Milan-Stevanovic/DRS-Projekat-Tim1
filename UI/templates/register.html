@@ -1,21 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../static/styles/form.css" />
     <title>Register</title>
-</head>
-<body>
-    Register
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1 class="form__headline">Register</h1>
 
-    <form action="http://127.0.0.1:5001/register" method="POST">
-        <!-- TODO: User form + add fields -> html + css-->
-        <p>name <input type="text" name="name" /></p>
-        <p>lastname <input type="text" name="lastname" /></p>
-        <p>email <input type="email" name="email" /></p>
-        <p>password <input type="password" name="password" /></p>
-        <p><input type="submit" value="Register" /></p>
-    </form>
-</body>
+      <form class="form" action="http://127.0.0.1:5001/register" method="POST">
+        <table>
+          <tr>
+            <td>
+              <label class="form__label" for="name">Name:</label>
+            </td>
+            <td>
+              <input class="form__input" type="text" name="name" required />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="lastname">Last name:</label>
+            </td>
+            <td>
+              <input class="form__input" type="text" name="lastname" required />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="email">Email:</label>
+            </td>
+            <td>
+              <input class="form__input" type="email" name="email" required />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="password">Password:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="password"
+                name="password"
+                required
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="address">Address:</label>
+            </td>
+            <td>
+              <input class="form__input" type="text" name="address" required />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="city">City:</label>
+            </td>
+            <td>
+              <input class="form__input" type="text" name="city" required />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="country">Country:</label>
+            </td>
+            <td>
+              <input class="form__input" type="text" name="country" required />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="phoneNum">Phone Number:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="number"
+                name="phoneNum"
+                required
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class="button" colspan="2">
+              <input
+                class="form__input form__input--button"
+                type="submit"
+                value="Register"
+              />
+            </td>
+          </tr>
+        </table>
+      </form>
+    </div>
+  </body>
 </html>

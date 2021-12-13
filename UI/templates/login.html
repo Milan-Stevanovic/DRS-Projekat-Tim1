@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../static/styles/form.css" />
+    <title>Register</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1 class="form__headline">Log In</h1>
+
+      <form class="form" action="http://127.0.0.1:5001/login" method="POST">
+        <table>
+          <tr>
+            <td>
+              <label class="form__label" for="email">Email:</label>
+            </td>
+            <td>
+              <input class="form__input" type="email" name="email" required />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="password">Password:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="password"
+                name="password"
+                required
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class="button" colspan="2">
+              <input
+                class="form__input form__input--button"
+                type="submit"
+                value="Log In"
+              />
+            </td>
+          </tr>
+        </table>
+      </form>
+    </div>
+  </body>
+</html>
