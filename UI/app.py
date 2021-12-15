@@ -5,7 +5,6 @@ import requests
 
 app = Flask(__name__)
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -31,18 +30,22 @@ def register():
         body = json.dumps({'name': _name,'lastname':_lastname,'email':_email,'password':_password,'address':_address,'city':_city,'country':_country,'phoneNum':_phoneNum,'balance':_balance,'verified':_verified,"cardNum":_cardNum})
         req = requests.post("http://127.0.0.1:5001/api/register",data = body,headers = headers)
 
-        # response = (req.json())["message"]     
-        # return json.dumps({'html': '<span>'+ response + '</span>'})
         _message = (req.json())["message"]     
         return render_template('register.html', message = _message)
 
-
-
-@app.route('/login')
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-    return render_template('login.html')
+    if request.method == 'GET':
+        return render_template('login.html')
+    else:
+        _email = request.form['email']
+        _password = request.form['password']
 
+        headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
+        body = json.dumps({'email':_email,'password':_password })
+        req = requests.post("http://127.0.0.1:5001/api/login",data = body,headers = headers)
 
-
+        _message = (req.json())["message"]     
+        return render_template('login.html', message = _message)
 
 app.run(port=5000)

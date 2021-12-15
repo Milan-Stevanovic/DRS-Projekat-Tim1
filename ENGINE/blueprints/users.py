@@ -5,6 +5,8 @@ user_blueprint = Blueprint('user_blueprint', __name__)
  
 from app import mysql
 
+# TODO: Add tracking session
+
 @user_blueprint.route('/register', methods=['POST'])
 def register():
     content = flask.request.json
@@ -30,6 +32,25 @@ def register():
 
     return retVal
 
+# Added log in functionality
+@user_blueprint.route('/login', methods=['POST'])
+def login():
+    content = flask.request.json
+    _email = content['email']
+    _password = content['password']
+
+    user = getUser(_email)
+
+    if user == None:
+        retVal = {'message' : 'User with that email does not exist!'}
+    elif user['password'] == _password:
+        retVal = {'message' : 'Logged in successfull!'}
+    else:
+        retVal = {'message' : 'Fail: Wrong password'}
+
+    return retVal
+
+# ===================================== Functions for dataBase access ====================================== 
 def userExists(email: str) -> bool :
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM user WHERE email = %s", (email,))
@@ -45,3 +66,12 @@ def registerUser(name, lastname, email, password, address, city, country, phoneN
     cursor.execute(''' INSERT INTO user VALUES(NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',(name, lastname, email, password, address, city, country, phoneNum, balance, verified, cardNum))
     mysql.connection.commit()
     cursor.close()
+
+# Dodata funkcija koja vraca user-a na osnovu email-a
+def getUser(email : str) -> dict:
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM user WHERE email = %s", (email,))
+    user = cursor.fetchone()
+    cursor.close()
+
+    return user
