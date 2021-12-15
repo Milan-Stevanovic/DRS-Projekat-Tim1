@@ -11,7 +11,7 @@
     <div class="wrapper">
       <h1 class="form__headline">Register</h1>
 
-      <form class="form" action="http://127.0.0.1:5001/register" method="POST">
+      <form class="form" action="http://127.0.0.1:5000/register" method="POST">
         <table>
           <tr>
             <td>
@@ -95,7 +95,10 @@
                 value="Register"
               />
             </td>
-          </tr>
+          </tr>  
+          <tr>
+            <td>{{ message }}</td>
+          </tr>      
         </table>
       </form>
     </div>
