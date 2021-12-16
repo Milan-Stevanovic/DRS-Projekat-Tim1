@@ -8,6 +8,19 @@
     <title>Register</title>
   </head>
   <body>
+    <ul>
+      <li><a href="/">Bank</a></li>
+      {% if not session.email %}
+      <li><a href="/login">Login</a></li>
+      <li><a href="/register">Register</a></li>
+      {% endif %}
+
+      {% if session.email %}
+      <li style="float: right;"><a href="/logout">Logout</a></li>
+      <li style="float: right;"><a href="/profile">{{ session.email }}</a></li>
+      {% endif %}
+    </ul>
+
     <div class="wrapper">
       <h1 class="form__headline">Register</h1>
 

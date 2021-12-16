@@ -1,13 +1,23 @@
+import re
 from flask import Flask, render_template, request, json, session, jsonify
+from flask.helpers import url_for
 import requests
-
+from werkzeug.utils import redirect
 
 
 app = Flask(__name__)
+app.config["SESSION_PERMANENT"] = False
+app.secret_key = '98aw3qj3eq2390dq239'
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if 'email' in session:
+        headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
+        body = json.dumps({'email': session['email']})
+        req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
+        user = (req.json())
+        return render_template('index.html', user = user)
+    return render_template('login.html')
 
 @app.route('/register',methods = ['POST','GET'])
 def register():
@@ -30,7 +40,12 @@ def register():
         body = json.dumps({'name': _name,'lastname':_lastname,'email':_email,'password':_password,'address':_address,'city':_city,'country':_country,'phoneNum':_phoneNum,'balance':_balance,'verified':_verified,"cardNum":_cardNum})
         req = requests.post("http://127.0.0.1:5001/api/register",data = body,headers = headers)
 
-        _message = (req.json())["message"]     
+        response = (req.json())
+        _message = response['message']
+        _code = req.status_code
+        if _code == 200:
+            session['email'] = _email
+            return redirect(url_for('index'))
         return render_template('register.html', message = _message)
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -45,7 +60,36 @@ def login():
         body = json.dumps({'email':_email,'password':_password })
         req = requests.post("http://127.0.0.1:5001/api/login",data = body,headers = headers)
 
-        _message = (req.json())["message"]     
-        return render_template('login.html', message = _message)
+        response = (req.json())
+        _message = response['message']
+        _code = req.status_code
+        if _code == 200:
+            session['email'] = _email
+            return redirect(url_for('index'))
+        else:
+            session['email'] = None
+            return render_template('login.html', message = _message)
+
+@app.route('/logout')
+def logout():
+    session.pop('email', None)
+    return redirect(url_for('index'))
+
+@app.route('/linkCard', methods=['POST'])
+def linkCard():
+    _cardNum = request.form['cardNum']
+    _owner = request.form['owner']
+    _month = request.form['month']
+    _year = request.form['year']
+    _expDate = _month + '/' + _year
+    _securityCode = request.form['securityCode']
+
+    headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
+    body = json.dumps({ 'email': session['email'], 'cardNum' : _cardNum, 'owner' : _owner, 'expDate' : _expDate, 'securityCode' : _securityCode })
+    req = requests.post("http://127.0.0.1:5001/api/linkCard", data = body, headers = headers)
+    response = (req.json())
+
+    return redirect(url_for('index'))
+
 
 app.run(port=5000)

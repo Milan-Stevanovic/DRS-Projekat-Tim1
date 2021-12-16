@@ -1,11 +1,10 @@
-from flask import Blueprint, request, json, jsonify
+from flask import Blueprint, request, json, jsonify, session
 import requests, flask
+from werkzeug.wrappers import response
 
 user_blueprint = Blueprint('user_blueprint', __name__)
  
 from app import mysql
-
-# TODO: Add tracking session
 
 @user_blueprint.route('/register', methods=['POST'])
 def register():
@@ -24,11 +23,11 @@ def register():
     _cardNum = content['cardNum']
     
     if userExists(_email):
-       retVal = {'message' : 'User already registered'}
+       retVal = {'message' : 'User already registered'}, 400
        return retVal
     
     registerUser(_name, _lastname, _email, _password, _address, _city, _country, _phoneNum, _balance, _verified, _cardNum)
-    retVal = {'message' : 'User successfully registered'}
+    retVal = {'message' : 'User successfully registered'}, 200
 
     return retVal
 
@@ -42,21 +41,38 @@ def login():
     user = getUser(_email)
 
     if user == None:
-        retVal = {'message' : 'User with that email does not exist!'}
+        retVal = {'message' : 'User with that email does not exist!'}, 400
     elif user['password'] == _password:
-        retVal = {'message' : 'Logged in successfull!'}
+        retVal = {'message' : 'Logged in successfull!'}, 200
     else:
-        retVal = {'message' : 'Fail: Wrong password'}
+        retVal = {'message' : 'Fail: Wrong password'}, 400
 
     return retVal
+
+@user_blueprint.route('/getUserFromDB', methods=['GET'])
+def getUserFromDB():
+    content = flask.request.json
+    _email = content['email']
+    return getUser(_email)
+
+@user_blueprint.route('/linkCard', methods=['POST', 'GET'])
+def linkCard():
+    content = flask.request.json
+    _email = content['email']
+    _cardNum = content['cardNum']
+    _owner = content['owner']
+    _expDate = content['expDate']
+    _securityCode = content['securityCode']
+    linkCardWithUser(_email, _cardNum, _owner, _expDate, _securityCode)
+    return {'message' : 'Card linked successfully!'}, 200
 
 # ===================================== Functions for dataBase access ====================================== 
 def userExists(email: str) -> bool :
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM user WHERE email = %s", (email,))
     account = cursor.fetchone()
+    cursor.close()
     if account:
-        cursor.close()
         return True
     else:
         return False
@@ -73,5 +89,15 @@ def getUser(email : str) -> dict:
     cursor.execute("SELECT * FROM user WHERE email = %s", (email,))
     user = cursor.fetchone()
     cursor.close()
-
     return user
+
+def linkCardWithUser(email, cardNum, owner, expDate, securityCode):
+    
+    #TODO: Proveriti da li kartica sa tim brojem vec postoji u bazi podataka pre dodavanja (obrisati komentar kada je uradjeno)
+
+    cursor = mysql.connection.cursor()
+    cursor.execute(''' INSERT INTO card VALUES (%s, %s, %s, %s)''', (cardNum, owner, expDate, securityCode))
+    mysql.connection.commit()
+    cursor.execute(''' UPDATE user SET cardNum = %s, verified = 1, balance = -1 WHERE email = %s''', (cardNum, email))
+    mysql.connection.commit()
+    cursor.close()

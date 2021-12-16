@@ -4,12 +4,64 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../static/styles/form.css">
     <title>Index</title>
   </head>
   <body>
-    Banka
 
-    <a href="/register">Register</a>
-    <a href="/login">Log In</a>
+    <!-- Kao neki navbar, cisto da imamo nesto na indexu -->
+    <ul>
+      <li><a href="/">Bank</a></li>
+      {% if not session.email %}
+      <li><a href="/login">Login</a></li>
+      <li><a href="/register">Register</a></li>
+      {% endif %}
+
+      {% if session.email %}
+      <li style="float: right;"><a href="/logout">Logout</a></li>
+      <li style="float: right;"><a href="/profile">{{ user.name }} {{ user.lastname }}</a></li>
+      {% endif %}
+    </ul>
+
+    <!-- TODO: center this -->
+    <div class="wrapper">
+      <h1>Welcome to the Bank</h1>
+    </div>
+    
+    <!-- TODO: Check if card info is valid -->
+    Link card
+    <form action="http://127.0.0.1:5000/linkCard" method="POST">
+      <table>
+        <tr>
+          <td>Card number</td>
+          <td><input name="cardNum" type="number" required></td>
+        </tr>
+        <tr>
+          <td>Owner</td>
+          <td><input name="owner" type="text" required></td>
+        </tr>
+        <tr>
+          <td>Expiration Date</td>
+          <td>
+            <input name="month" type="number" max="12" required>
+            <input name="year" type="number" max="99" required>
+          </td>
+        </tr>
+        <tr>
+          <td>Security Code</td>
+          <td><input name="securityCode" type="number" max="999" required></td>
+        </tr>
+        <tr>
+          <td class="button" colspan="2">
+            <input
+              class="form__input form__input--button"
+              type="submit"
+              value="Link card"
+            />
+          </td>
+        </tr>  
+      </table>
+    </form>
+
   </body>
 </html>
