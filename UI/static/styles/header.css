@@ -1,0 +1,49 @@
+.header {
+  background-color: #333;
+  width: 100%;
+}
+
+.nav {
+  top: 0;
+  width: 100%;
+  display: inline-block;
+}
+
+.nav__left {
+  float: left;
+  padding-top: 5px;
+  margin: 0 15px;
+}
+
+.nav__right {
+  float: right;
+  padding-top: 5px;
+  margin: 0 15px;
+}
+
+.nav__items {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.nav__item {
+  display: inline-block;
+  background-color: #111;
+  border-radius: 8px;
+}
+
+.nav__link {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+.nav__link:hover {
+  background-color: #444343;
+  transition: all 0.3s ease-in-out;
+  border-radius: 8px;
+}
