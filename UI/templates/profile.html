@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../static/styles/form.css">
+    <title>Index</title>
+  </head>
+  <body>
+    <ul>
+        <li><a href="/">Bank</a></li>
+        {% if session.email %}
+        <li style="float: right;"><a href="/logout">Logout</a></li>
+        <li style="float: right;"><a href="/profile"></a></li>
+        {% endif %}
+      </ul>
+      
+      <div class="wrapper">
+        <h1 class="form__headline">Profile info</h1>
+       
+         
+      
+          <table>
+            <tr>
+              <td>
+                <label class="form__label" for="name">Name:</label>
+              </td>
+              <td>
+                <label class="form__label" name="name" >{{korisnik.name}}</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="form__label" for="lastname">Last name:</label>
+              </td>
+              <td>
+                <label class="form__label" name="lastname" >{{korisnik.lastname}}</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="form__label" for="email">Email:</label>
+              </td>
+              <td>
+                <label class="form__label"  for="email" >{{korisnik.email}}</label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="form__label" for="password">Password:</label>
+              </td>
+              <td>
+                <label
+                  class="form__label"
+                  for="password">
+                  {{korisnik.password}}
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="form__label" for="address">Address:</label>
+              </td>
+              <td>
+                <label class="form__label" for="address" >{{korisnik.address}}</label>  
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="form__label" for="city">City:</label>
+              </td>
+              <td>
+                <label class="form__label" for="city">{{korisnik.city}}</label>  
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="form__label" for="country">Country:</label>
+              </td>
+              <td>
+                <label class="form__label" for="country">{{korisnik.country}}</label>  
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label class="form__label" for="phonNum">Phone Number:</label>
+              </td>
+              <td>
+                <label
+                  class="form__label"
+                  for="phonNum"
+                > {{korisnik.phonNum}}</label> 
+              </td>
+            </tr>
+            <tr>
+              <td class="button" colspan="2">
+                <a href = "/updateProfile"
+                  class="form__input form__input--button"   
+                >Edit profile</a>
+              </td>
+            </tr>  
+               
+          </table>
+    
+    
+      </div>
+  </body>
+  </html>
