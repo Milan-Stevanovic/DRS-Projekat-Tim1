@@ -16,7 +16,20 @@ def index():
         body = json.dumps({'email': session['email']})
         req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
         user = (req.json())
-        return render_template('index.html', user = user)
+
+        dummyCard = json.dumps({'email': 'dummy@gmail.com', 'cardNum': 'dummy', 'owner': 'dummy', 'expDate': 'dummy', 'securityCode': 'dummy'})
+        card = dummyCard;
+
+        body = json.dumps({'cardNum': session['cardNum']})
+        req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
+        test = (req.json())
+
+        if test != None:
+            card = test
+
+        print(card)        
+        # TODO POGLEDATI I SREDITI KARTICU
+        return render_template('index.html', user = user, card = card)
     return render_template('login.html')
 
 @app.route('/register',methods = ['POST','GET'])
@@ -45,6 +58,12 @@ def register():
         _code = req.status_code
         if _code == 200:
             session['email'] = _email
+
+            body = json.dumps({'email': session['email']})
+            req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
+            user = (req.json())
+            session['cardNum'] = user['cardNum']
+            
             return redirect(url_for('index'))
         return render_template('register.html', message = _message)
 
@@ -65,9 +84,20 @@ def login():
         _code = req.status_code
         if _code == 200:
             session['email'] = _email
+
+            body = json.dumps({'email': session['email']})
+            req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
+            user = (req.json())
+
+            if user != None:
+                session['cardNum'] = user['cardNum']
+            else:
+                session['cardNum'] = user['dummy']
+            
             return redirect(url_for('index'))
         else:
             session['email'] = None
+            session['cardNum'] = None
             return render_template('login.html', message = _message)
 
 @app.route('/logout')
@@ -88,6 +118,14 @@ def linkCard():
     body = json.dumps({ 'email': session['email'], 'cardNum' : _cardNum, 'owner' : _owner, 'expDate' : _expDate, 'securityCode' : _securityCode })
     req = requests.post("http://127.0.0.1:5001/api/linkCard", data = body, headers = headers)
     response = (req.json())
+    # TODO kada unese karticu, dda se odma renderuje index.html
+    # body = json.dumps({'email': session['email']})
+    # req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
+    # user = (req.json())
+
+    # body = json.dumps({'cardNum': session['cardNum']})
+    # req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
+    # card = (req.json())
 
     return redirect(url_for('index'))
 

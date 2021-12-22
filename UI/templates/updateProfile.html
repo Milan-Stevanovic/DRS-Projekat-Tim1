@@ -10,104 +10,137 @@
   <body>
     <ul>
       {% if session.email %}
-      <li style="float: right;"><a href="/logout">Logout</a></li>
-      <li style="float: right;"><a href="/profile">{{ session.email }}</a></li>
+      <li style="float: right"><a href="/logout">Logout</a></li>
+      <li style="float: right"><a href="/profile">{{ session.email }}</a></li>
       {% endif %}
     </ul>
 
     <div class="wrapper">
-        <h1 class="form__headline">Update user info</h1>
-  
-        <form class="form" action="http://127.0.0.1:5000/updateProfile" method="POST">
-          <table>
-            <tr>
-              <td>
-                <label class="form__label" for="name">Name:</label>
-              </td>
-              <td>
-                <input class="form__input" type="text" name="name" required  value = "{{korisnik.name}}" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label class="form__label" for="lastname">Last name:</label>
-              </td>
-              <td>
-                <input class="form__input" type="text" name="lastname" required value = "{{korisnik.lastname}}" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label class="form__label" for="email">Email:</label>
-              </td>
-              <td>
-                <label class="form__label" for="email" >{{korisnik.email}}</label>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label class="form__label" for="password">Password:</label>
-              </td>
-              <td>
-                <input
-                  class="form__input"
-                  type="password"
-                  name="password"
-                  required
-                  value={{korisnik.password}}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label class="form__label" for="address">Address:</label>
-              </td>
-              <td>
-                <input class="form__input" type="text" name="address" required value = "{{korisnik.address}}" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label class="form__label" for="city">City:</label>
-              </td>
-              <td>
-                <input class="form__input" type="text" name="city" required value = "{{korisnik.city}}" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label class="form__label" for="country">Country:</label>
-              </td>
-              <td>
-                <input class="form__input" type="text" name="country" required value = "{{korisnik.country}}" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label class="form__label" for="phonNum">Phone Number:</label>
-              </td>
-              <td>
-                <input
-                  class="form__input"
-                  type="number"
-                  name="phonNum"
-                  required
-                  value = "{{korisnik.phonNum}"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td class="button" colspan="2">
-                <input
-                  class = "form__input form__input--button"
-                  type = "submit"
-                  value = "Update"
-                />
-              </td>
-            </tr>       
-          </table>
-        </form>
-      </div>
-    </body>
-  </html>
-  
+      <h1 class="form__headline">Update user info</h1>
+
+      <form
+        class="form"
+        action="http://127.0.0.1:5000/updateProfile"
+        method="POST"
+      >
+        <table>
+          <tr>
+            <td>
+              <label class="form__label" for="name">Name:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="text"
+                name="name"
+                required
+                value="{{korisnik.name}}"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="lastname">Last name:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="text"
+                name="lastname"
+                required
+                value="{{korisnik.lastname}}"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="email">Email:</label>
+            </td>
+            <td>
+              <label class="form__label" for="email">{{korisnik.email}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="password">Password:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="password"
+                name="password"
+                required
+                value="{{korisnik.password}}"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="address">Address:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="text"
+                name="address"
+                required
+                value="{{korisnik.address}}"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="city">City:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="text"
+                name="city"
+                required
+                value="{{korisnik.city}}"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="country">Country:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="text"
+                name="country"
+                required
+                value="{{korisnik.country}}"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="form__label" for="phonNum">Phone Number:</label>
+            </td>
+            <td>
+              <input
+                class="form__input"
+                type="number"
+                name="phonNum"
+                required
+                value="{{korisnik.phonNum}}"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class="button" colspan="2">
+              <input
+                class="form__input form__input--button"
+                type="submit"
+                value="Update"
+              />
+            </td>
+          </tr>
+        </table>
+      </form>
+    </div>
+  </body>
+</html>

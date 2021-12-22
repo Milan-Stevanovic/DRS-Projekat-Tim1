@@ -58,6 +58,12 @@ def getUserFromDB():
     _email = content['email']
     return getUser(_email)
 
+@user_blueprint.route('/getUserCardFromDB', methods=['GET'])
+def getUserCardFromDB():
+    content = flask.request.json
+    _cardNum = content['cardNum']
+    return getCard(_cardNum)
+
 @user_blueprint.route('/linkCard', methods=['POST', 'GET'])
 def linkCard():
     content = flask.request.json
@@ -127,6 +133,19 @@ def getUser(email : str) -> dict:
     user = cursor.fetchone()
     cursor.close()  
     return user
+
+# TODO KARTICA
+def getCard(cardNum : str) -> dict:
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM card WHERE cardNum = %s", (cardNum,))
+    card = cursor.fetchone()
+    cursor.close() 
+
+    if card != None:
+        return card
+    else:
+        dummyCard = json.dumps({'email': 'dummy@gmail.com', 'cardNum': 'dummy', 'owner': 'dummy', 'expDate': 'dummy', 'securityCode': 'dummy'})
+        return dummyCard
 
 def linkCardWithUser(email, cardNum, owner, expDate, securityCode):
     

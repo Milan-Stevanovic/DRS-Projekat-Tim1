@@ -42,7 +42,6 @@
       </nav>
     </header>
 
-    <!-- TODO: center this -->
     <section class="section">
       <div class="wrapper">
         <div class="headline">
@@ -53,6 +52,7 @@
 
     <!-- TODO: Check if card info is valid -->
     <section class="section">
+      {% if user.verified == 0 %}
       <div class="wrapper">
         <form
           class="form"
@@ -129,6 +129,29 @@
           </table>
         </form>
       </div>
+      {% endif %} {% if user.verified != 0 %}
+      <div class="wrapper">
+        <h1 class="form__headline">Linked Card</h1>
+        <table>
+          <tr>
+            <td>
+              <label for="cardNum" class="form__label">Card number</label>
+            </td>
+            <td>
+              <label for="cardNum" class="form__label">{{card.cardNum}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="date" class="form__label">Expiration Date</label>
+            </td>
+            <td>
+              <label for="date" class="form__label">{{card.expDate}}</label>
+            </td>
+          </tr>
+        </table>
+      </div>
+      {% endif %}
     </section>
   </body>
 </html>
