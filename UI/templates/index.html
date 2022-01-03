@@ -15,7 +15,7 @@
         <div class="nav__left">
           <ul class="nav__items">
             <li class="nav__item"><a class="nav__link" href="/">Bank</a></li>
-            {% if not session.email %}
+            {% if not session.user %}
             <li class="nav__item">
               <a class="nav__link" href="/login">Login</a>
             </li>
@@ -27,14 +27,12 @@
         </div>
         <div class="nav__right">
           <ul class="nav__items">
-            {% if session.email %}
+            {% if session.user %}
             <li class="nav__item">
-              <a class="nav__link" href="/logout">Logout</a>
+              <a class="nav__link" href="/profile">{{ user.name }} {{ user.lastname }}</a>
             </li>
             <li class="nav__item">
-              <a class="nav__link" href="/profile"
-                >{{ user.name }} {{ user.lastname }}</a
-              >
+              <a class="nav__link" href="/logout">Logout</a>
             </li>
             {% endif %}
           </ul>
@@ -126,6 +124,13 @@
                 />
               </td>
             </tr>
+            {% if message %}
+            <tr>
+              <td colspan="2">
+                {{ message }}
+              </td>
+            </tr>
+            {% endif %}
           </table>
         </form>
       </div>
@@ -139,6 +144,14 @@
             </td>
             <td>
               <label for="cardNum" class="form__label">{{card.cardNum}}</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="owner" class="form__label">Owner</label>
+            </td>
+            <td>
+              <label for="owner" class="form__label">{{card.owner}}</label>
             </td>
           </tr>
           <tr>

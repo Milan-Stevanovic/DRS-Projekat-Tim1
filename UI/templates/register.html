@@ -18,16 +18,16 @@
         </div>
         <div class="nav__right">
           <ul class="nav__items">
-            {% if session.email %}
-            <li class="nav__item">
-              <a class="nav__link" href="/logout">Logout</a>
-            </li>
+            {% if session.user %}
             <li class="nav__item">
               <a class="nav__link" href="/profile"
                 >{{ user.name }} {{ user.lastname }}</a
               >
             </li>
-            {% endif %} {% if not session.email %}
+            <li class="nav__item">
+              <a class="nav__link" href="/logout">Logout</a>
+            </li>
+            {% endif %} {% if not session.user %}
             <li class="nav__item">
               <a class="nav__link" href="/login">Login</a>
             </li>

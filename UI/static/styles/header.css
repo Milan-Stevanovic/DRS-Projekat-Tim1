@@ -30,8 +30,12 @@
 
 .nav__item {
   display: inline-block;
-  background-color: #111;
   border-radius: 8px;
+}
+
+.nav__item:hover{
+  background-color: #111;
+  transition: all 0.3s ease-in-out;
 }
 
 .nav__link {
@@ -40,10 +44,4 @@
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
-}
-
-.nav__link:hover {
-  background-color: #444343;
-  transition: all 0.3s ease-in-out;
-  border-radius: 8px;
 }

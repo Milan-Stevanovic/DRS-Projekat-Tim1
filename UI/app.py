@@ -1,9 +1,8 @@
-import re
 from flask import Flask, render_template, request, json, session, jsonify
 from flask.helpers import url_for
-import requests,flask
+import requests
 from werkzeug.utils import redirect
-
+from urllib.request import Request, urlopen
 
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
@@ -11,25 +10,16 @@ app.secret_key = '98aw3qj3eq2390dq239'
 
 @app.route('/')
 def index():
-    if 'email' in session:
-        headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
-        body = json.dumps({'email': session['email']})
-        req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
-        user = (req.json())
-
-        dummyCard = json.dumps({'email': 'dummy@gmail.com', 'cardNum': 'dummy', 'owner': 'dummy', 'expDate': 'dummy', 'securityCode': 'dummy'})
-        card = dummyCard;
-
-        body = json.dumps({'cardNum': session['cardNum']})
-        req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
-        test = (req.json())
-
-        if test != None:
-            card = test
-
-        print(card)        
-        # TODO POGLEDATI I SREDITI KARTICU
-        return render_template('index.html', user = user, card = card)
+    if 'user' in session:
+        if session['user']['verified'] != 0: #verifikovan
+            # uzmi karticu
+            headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
+            body = json.dumps({'cardNum': session['user']['cardNum']})
+            req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
+            card = (req.json())
+            return render_template('index.html', user = session['user'], card = card)
+        else:
+            return render_template('index.html', user = session['user'])
     return render_template('login.html')
 
 @app.route('/register',methods = ['POST','GET'])
@@ -50,19 +40,17 @@ def register():
         _cardNum = "-1"
 
         headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
-        body = json.dumps({'name': _name,'lastname':_lastname,'email':_email,'password':_password,'address':_address,'city':_city,'country':_country,'phoneNum':_phoneNum,'balance':_balance,'verified':_verified,"cardNum":_cardNum})
-        req = requests.post("http://127.0.0.1:5001/api/register",data = body,headers = headers)
+        body = json.dumps({'name': _name, 'lastname':_lastname, 'email':_email, 'password':_password, 'address':_address, 'city':_city, 'country':_country, 'phoneNum':_phoneNum, 'balance':_balance, 'verified':_verified, "cardNum":_cardNum})
+        req = requests.post("http://127.0.0.1:5001/api/register", data = body, headers = headers)
 
         response = (req.json())
         _message = response['message']
         _code = req.status_code
         if _code == 200:
-            session['email'] = _email
-
-            body = json.dumps({'email': session['email']})
+            headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
+            body = json.dumps({'email': _email})
             req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
-            user = (req.json())
-            session['cardNum'] = user['cardNum']
+            session['user'] = (req.json())
             
             return redirect(url_for('index'))
         return render_template('register.html', message = _message)
@@ -83,26 +71,18 @@ def login():
         _message = response['message']
         _code = req.status_code
         if _code == 200:
-            session['email'] = _email
-
-            body = json.dumps({'email': session['email']})
+            headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
+            body = json.dumps({'email': _email})
             req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
-            user = (req.json())
-
-            if user != None:
-                session['cardNum'] = user['cardNum']
-            else:
-                session['cardNum'] = user['dummy']
-            
+            session['user'] = (req.json())
             return redirect(url_for('index'))
         else:
-            session['email'] = None
-            session['cardNum'] = None
+            session['user'] = None
             return render_template('login.html', message = _message)
 
 @app.route('/logout')
 def logout():
-    session.pop('email', None)
+    session.pop('user', None)
     return redirect(url_for('index'))
 
 @app.route('/linkCard', methods=['POST'])
@@ -114,43 +94,42 @@ def linkCard():
     _expDate = _month + '/' + _year
     _securityCode = request.form['securityCode']
 
+    # Check if card with same cardNum is already registered
     headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
-    body = json.dumps({ 'email': session['email'], 'cardNum' : _cardNum, 'owner' : _owner, 'expDate' : _expDate, 'securityCode' : _securityCode })
-    req = requests.post("http://127.0.0.1:5001/api/linkCard", data = body, headers = headers)
+    body = json.dumps({ 'cardNum' : _cardNum })
+    req = requests.post("http://127.0.0.1:5001/api/checkCard", data = body, headers = headers)
     response = (req.json())
-    # TODO kada unese karticu, dda se odma renderuje index.html
-    # body = json.dumps({'email': session['email']})
-    # req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
-    # user = (req.json())
+    _message = response['message']
+    _code = req.status_code
+    if _code == 400:
+        return render_template('index.html', user = session['user'], message = _message)
 
-    # body = json.dumps({'cardNum': session['cardNum']})
-    # req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
-    # card = (req.json())
+    # Update cardNum in 'user' table and insert new row in 'card' table
+    headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
+    body = json.dumps({ 'email': session['user']['email'], 'cardNum' : _cardNum, 'owner' : _owner, 'expDate' : _expDate, 'securityCode' : _securityCode })
+    requests.post("http://127.0.0.1:5001/api/linkCard", data = body, headers = headers)
+
+    # User changed, update user in session
+    headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
+    body = json.dumps({'email': session['user']['email']})
+    req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
+    session['user'] = (req.json())
 
     return redirect(url_for('index'))
 
 @app.route('/profile',methods = ['GET'])
 def changeProfileInfo():
-    #ako je get metod onda ispisujemo informacije korisnika
-     headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
-     body = json.dumps({ 'email': session['email']})
-     req = requests.post("http://127.0.0.1:5001/api/profile", data = body, headers = headers)
-     response = (req.json())
-     return render_template('profile.html',korisnik = response)
+    # ako je get metod onda ispisujemo informacije korisnika
+    return render_template('profile.html', user = session['user'])
 
-@app.route('/updateProfile',methods = ['POST','GET'])
+@app.route('/updateProfile', methods = ['POST','GET'])
 def updateProfileInfo():
     if request.method == 'GET':
-        headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
-        body = json.dumps({ 'email': session['email']})
-        req = requests.post("http://127.0.0.1:5001/api/profile", data = body, headers = headers)
-        response = (req.json())
-        
-        return render_template('updateProfile.html',korisnik = response)
+       return render_template('updateProfile.html', user = session['user'])
     else:
         _name = request.form['name']
         _lastname = request.form['lastname']
-        _email = session['email']
+        _email = session['user']['email']
         _password = request.form['password']
         _address = request.form['address']
         _city = request.form['city']
@@ -161,16 +140,20 @@ def updateProfileInfo():
         #_verified = request.form['verified']
         #_cardNum = request.form['cardNum']
         
-        headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
-        body = json.dumps({'name': _name,'lastname':_lastname,'email':_email,'password':_password,'address':_address,'city':_city,'country':_country,'phoneNum':_phoneNum})
-        req = requests.post("http://127.0.0.1:5001/api/updateProfile",data = body,headers = headers)
-       
-        user = (req.json())
-        
+        headers = {'Content-type' : 'application/json', 'Accept' : 'text/plain'}
+        body = json.dumps({'name' : _name, 'lastname' : _lastname, 'email' : _email, 'password' : _password, 'address' : _address, 'city' : _city, 'country' : _country, 'phoneNum' : _phoneNum})
+        req = requests.post("http://127.0.0.1:5001/api/updateProfile", data = body, headers = headers)
+
+        # Get updated user and put it in session['user']
+        headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
+        body = json.dumps({'email': _email})
+        req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
+        session['user'] = (req.json())
+
         _code = req.status_code
         if _code == 200:
             return redirect(url_for('index'))
         return render_template('profile.html')
 
 
-app.run(port=5000)
+app.run(port=5000, debug=True)
