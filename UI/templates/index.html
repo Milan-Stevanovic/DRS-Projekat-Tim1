@@ -164,6 +164,25 @@
           </tr>
         </table>
       </div>
+      <!-- Adding funds to account -->
+      <form  action="http://127.0.0.1:5000/addFunds" method="POST">
+        <table>
+          <tr>
+            <td colspan="2"> Add funds to online account: </td>
+          </tr>
+          <tr>
+            <td>Amount: </td>
+            <td><input type="number" min="1" name="amount"></td>
+          </tr>
+          <tr>
+            <td>Currency: </td>
+            <td><input type="text" name="currency"></td>
+          </tr>
+          <tr>
+            <td><input type="submit" value="ADD"></td>
+          </tr>
+        </table>
+      </form>
       {% endif %}
     </section>
   </body>

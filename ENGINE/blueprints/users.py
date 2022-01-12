@@ -24,12 +24,14 @@ def register():
     _balance = content['balance']
     _verified = content['verified']
     _cardNum = content['cardNum']
+    _currency = content['currency']
+    _accountNum = content['accountNum']
     
     if userExists(_email):
        retVal = {'message' : 'User already registered'}, 400
        return retVal
     
-    registerUser(_name, _lastname, _email, _password, _address, _city, _country, _phoneNum, _balance, _verified, _cardNum)
+    registerUser(_name, _lastname, _email, _password, _address, _city, _country, _phoneNum, _balance, _verified, _cardNum, _currency, _accountNum)
     retVal = {'message' : 'User successfully registered'}, 200
 
     return retVal
@@ -85,7 +87,7 @@ def linkCard():
     linkCardWithUser(_email, _cardNum, _owner, _expDate, _securityCode)
     return {'message' : 'Card linked successfully!'}, 200
 
-@user_blueprint.route('updateProfile',methods=['POST'])
+@user_blueprint.route('/updateProfile', methods = ['POST'])
 def updateProfile():
     content = flask.request.json
     _name = content['name']
@@ -107,6 +109,15 @@ def updateProfile():
 
     return retVal
 
+@user_blueprint.route('/addFunds', methods = ['POST'])
+def addFunds():
+    content = flask.request.json
+    _email = content['email']
+    _new_balance = content['new balance']
+    _currency = content['currency']
+
+    addFunds(_email, _new_balance, _currency)
+
 
 
 # ===================================== Functions for dataBase access ====================================== 
@@ -120,9 +131,9 @@ def userExists(email: str) -> bool :
     else:
         return False
 
-def registerUser(name, lastname, email, password, address, city, country, phoneNum, balance, verified, cardNum):
+def registerUser(name, lastname, email, password, address, city, country, phoneNum, balance, verified, cardNum, currency, accountNum):
     cursor = mysql.connection.cursor()
-    cursor.execute(''' INSERT INTO user VALUES(NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',(name, lastname, email, password, address, city, country, phoneNum, balance, verified, cardNum))
+    cursor.execute(''' INSERT INTO user VALUES(NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',(name, lastname, email, password, address, city, country, phoneNum, balance, verified, cardNum, currency, accountNum))
     mysql.connection.commit()
     cursor.close()
     
@@ -143,7 +154,6 @@ def getUser(email : str) -> dict:
     cursor.close()
     return user
 
-# TODO KARTICA
 def getCard(cardNum : str) -> dict:
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM card WHERE cardNum = %s", (cardNum,))
@@ -151,13 +161,16 @@ def getCard(cardNum : str) -> dict:
     cursor.close()
     return card
 
-def linkCardWithUser(email, cardNum, owner, expDate, securityCode):
-    
-    #TODO: Proveriti da li kartica sa tim brojem vec postoji u bazi podataka pre dodavanja (obrisati komentar kada je uradjeno)
-
+def linkCardWithUser(email : str, cardNum : str, owner : str, expDate : str, securityCode : str):
     cursor = mysql.connection.cursor()
     cursor.execute(''' INSERT INTO card VALUES (%s, %s, %s, %s)''', (cardNum, owner, expDate, securityCode))
     mysql.connection.commit()
     cursor.execute(''' UPDATE user SET cardNum = %s, verified = 1, balance = -1 WHERE email = %s''', (cardNum, email))
+    mysql.connection.commit()
+    cursor.close()
+
+def addFunds(email : str, new_balance : float, currency : str):
+    cursor = mysql.connection.cursor()
+    cursor.execute(''' UPDATE user SET balance = %s, currency = %s WHERE email = %s''', (new_balance, currency, email))
     mysql.connection.commit()
     cursor.close()

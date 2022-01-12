@@ -1,12 +1,15 @@
 from flask import Flask, render_template, request, json, session, jsonify
 from flask.helpers import url_for
 import requests
+import string
+import random
 from werkzeug.utils import redirect
 from urllib.request import Request, urlopen
 
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.secret_key = '98aw3qj3eq2390dq239'
+currency_dictionary
 
 @app.route('/')
 def index():
@@ -36,11 +39,17 @@ def register():
         _country = request.form['country']
         _phoneNum = request.form['phoneNum']
         _balance = "0"
-        _verified = "False"
+        _verified = 'False'
         _cardNum = "-1"
+        _currency = 'USD'
+        _accountNum = ''.join(random.choices(string.digits, k = 18))
+        print(_accountNum)
+
 
         headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
-        body = json.dumps({'name': _name, 'lastname':_lastname, 'email':_email, 'password':_password, 'address':_address, 'city':_city, 'country':_country, 'phoneNum':_phoneNum, 'balance':_balance, 'verified':_verified, "cardNum":_cardNum})
+        body = json.dumps({'name': _name, 'lastname':_lastname, 'email':_email, 'password':_password, 'address':_address, 
+                           'city':_city, 'country':_country, 'phoneNum':_phoneNum, 'balance':_balance, 'verified':_verified,
+                           'cardNum':_cardNum, 'currency': _currency, 'accountNum' : _accountNum})
         req = requests.post("http://127.0.0.1:5001/api/register", data = body, headers = headers)
 
         response = (req.json())
@@ -155,5 +164,40 @@ def updateProfileInfo():
             return redirect(url_for('index'))
         return render_template('profile.html')
 
+@app.route('/addFunds', methods = ['POST'])
+def addFunds(currency_dictionary : dict):
+    _amount = request.form['amount']
+    _currency = (request.form['currency']).upper()
+
+    _user_currency = session['user']['currency']
+
+    # need fixing, Tanjas input is required!
+    if _user_currency == 'RSD':
+        _new_balance = float(_amount) + float(session['user']['balance'])
+    elif _user_currency == _currency:
+        _new_balance = float(_amount) / currency_dictionary[_user_currency] + float(session['user']['balance'])
+    else:
+        _new_balance = float(_amount) / currency_dictionary[_user_currency] + float(session['user']['balance'])
+
+    headers = {'Content-type' : 'application/json', 'Accept' : 'text/plain'}
+    body = json.dumps({'email' : session['user']['email'], 'new balance' : _new_balance, 'currency' : _currency})
+    req = requests.post("http://127.0.0.1:5001/api/addFunds", data = body, headers = headers)
+
+    updateUserInSession(session['user']['email'])
+
+    return redirect(url_for('index'))
+
+
+def updateUserInSession(email):
+    # Get updated user and put it in session['user']
+    headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
+    body = json.dumps({'email': email})
+    req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
+    session['user'] = (req.json())
+
+def refreshCurrencyList(currency_dictionary : dict, base_currency : str):
+    # base currency is RSD
+    req = requests.get("https://freecurrencyapi.net/api/v2/latest?apikey=57fbaed0-7177-11ec-a390-0d2dac4cb175&base_currency=" + base_currency)
+    currency_dictionary = (req.json())['data']
 
 app.run(port=5000, debug=True)
