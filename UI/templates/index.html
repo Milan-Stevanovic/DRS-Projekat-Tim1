@@ -7,37 +7,42 @@
     <link rel="stylesheet" href="../static/styles/form.css" />
     <link rel="stylesheet" href="../static/styles/header.css" />
     <link rel="stylesheet" href="../static/styles/index.css" />
+    <link rel="stylesheet" href="../static/styles/main.css" />
     <title>Index</title>
   </head>
   <body>
     <header class="header">
-      <nav class="nav">
-        <div class="nav__left">
-          <ul class="nav__items">
-            <li class="nav__item"><a class="nav__link" href="/">Bank</a></li>
-            {% if not session.user %}
-            <li class="nav__item">
-              <a class="nav__link" href="/login">Login</a>
-            </li>
-            <li class="nav__item">
-              <a class="nav__link" href="/register">Register</a>
-            </li>
-            {% endif %}
-          </ul>
-        </div>
-        <div class="nav__right">
-          <ul class="nav__items">
-            {% if session.user %}
-            <li class="nav__item">
-              <a class="nav__link" href="/profile">{{ user.name }} {{ user.lastname }}</a>
-            </li>
-            <li class="nav__item">
-              <a class="nav__link" href="/logout">Logout</a>
-            </li>
-            {% endif %}
-          </ul>
-        </div>
-      </nav>
+      <div class="wrapper">
+        <nav class="nav">
+          <div class="nav__left">
+            <ul class="nav__items">
+              <li class="nav__item"><a class="nav__link" href="/">Bank</a></li>
+              {% if not session.user %}
+              <li class="nav__item">
+                <a class="nav__link" href="/login">Login</a>
+              </li>
+              <li class="nav__item">
+                <a class="nav__link" href="/register">Register</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="nav__right">
+            <ul class="nav__items">
+              {% if session.user %}
+              <li class="nav__item">
+                <a class="nav__link" href="/profile"
+                  >{{ user.name }} {{ user.lastname }}</a
+                >
+              </li>
+              <li class="nav__item">
+                <a class="nav__link" href="/logout">Logout</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </nav>
+      </div>
     </header>
 
     <section class="section">
@@ -50,140 +55,295 @@
 
     <!-- TODO: Check if card info is valid -->
     <section class="section">
-      {% if user.verified == 0 %}
       <div class="wrapper">
-        <form
-          class="form"
-          action="http://127.0.0.1:5000/linkCard"
-          method="POST"
-        >
-          <h1 class="form__headline">Link Card</h1>
-          <table>
-            <tr>
-              <td>
-                <label for="cardNum" class="form__label">Card number</label>
-              </td>
-              <td>
-                <input
-                  class="form__input"
-                  name="cardNum"
-                  type="number"
-                  required
-                />
-              </td>
-            </tr>
-            <tr>
-              <td><label for="owner" class="form__label">Owner</label></td>
-              <td>
-                <input class="form__input" name="owner" type="text" required />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label for="date" class="form__label">Expiration Date</label>
-              </td>
-              <td>
-                <input
-                  class="form__input form__input--date"
-                  name="month"
-                  type="number"
-                  max="12"
-                  required
-                />
-                <input
-                  class="form__input form__input--date"
-                  name="year"
-                  type="number"
-                  max="99"
-                  required
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label for="securityCode" class="form__label"
-                  >Security Code</label
-                >
-              </td>
-              <td>
-                <input
-                  class="form__input"
-                  name="securityCode"
-                  type="number"
-                  max="999"
-                  required
-                />
-              </td>
-            </tr>
-            <tr>
-              <td class="button" colspan="2">
-                <input
-                  class="form__input form__input--button"
-                  type="submit"
-                  value="Link card"
-                />
-              </td>
-            </tr>
-            {% if message %}
-            <tr>
-              <td colspan="2">
-                {{ message }}
-              </td>
-            </tr>
+        <div class="main">
+          <div class="left-div">
+            {% if user.verified == 0 %}
+            <div class="wrapper">
+              <form
+                class="form"
+                action="http://127.0.0.1:5000/linkCard"
+                method="POST"
+              >
+                <h1 class="section-headline">Link Card</h1>
+                <table>
+                  <tr>
+                    <td>
+                      <label for="cardNum" class="form__label"
+                        >Card number</label
+                      >
+                    </td>
+                    <td>
+                      <input
+                        class="form__input"
+                        name="cardNum"
+                        type="number"
+                        required
+                        min="1000000000000000"
+                        min="9999999999999999"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="owner" class="form__label">Owner</label>
+                    </td>
+                    <td>
+                      <input
+                        class="form__input"
+                        name="owner"
+                        type="text"
+                        required
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="date" class="form__label"
+                        >Expiration Date</label
+                      >
+                    </td>
+                    <td>
+                      <input
+                        class="form__input form__input--date"
+                        name="month"
+                        type="number"
+                        max="12"
+                        min="1"
+                        required
+                      />
+                      <input
+                        class="form__input form__input--date"
+                        name="year"
+                        type="number"
+                        max="99"
+                        min="1"
+                        required
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label for="securityCode" class="form__label"
+                        >Security Code</label
+                      >
+                    </td>
+                    <td>
+                      <input
+                        class="form__input"
+                        name="securityCode"
+                        type="number"
+                        max="999"
+                        min="100"
+                        required
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="button" colspan="2">
+                      <input
+                        class="form__input form__input--button"
+                        type="submit"
+                        value="Link card"
+                      />
+                    </td>
+                  </tr>
+                  {% if message %}
+                  <tr>
+                    <td colspan="2">{{ message }}</td>
+                  </tr>
+                  {% endif %}
+                </table>
+              </form>
+            </div>
+            {% endif %} {% if user.verified != 0 %}
+            <div class="wrapper">
+              <h1 class="section-headline">Card Information</h1>
+              <table class="section__table">
+                <tr>
+                  <td>
+                    <label for="cardNum" class="section__label"
+                      >Card number:</label
+                    >
+                  </td>
+                  <td>
+                    <label for="cardNum" class="section__label"
+                      >{{card.cardNum}}</label
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label for="owner" class="section__label">Owner:</label>
+                  </td>
+                  <td>
+                    <label for="owner" class="section__label"
+                      >{{card.owner}}</label
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label for="date" class="section__label"
+                      >Expiration Date:</label
+                    >
+                  </td>
+                  <td>
+                    <label for="date" class="section__label"
+                      >{{card.expDate}}</label
+                    >
+                  </td>
+                </tr>
+              </table>
+
+              <br />
+
+              <h1 class="section-headline">Balance Information</h1>
+              <table>
+                <tr>
+                  <td>
+                    <label class="section__label" for="balance"
+                      >Currently Available Balance:</label
+                    >
+                  </td>
+                  <td>
+                    <label class="section__label" name="balance">
+                      {{ user.balance }} {{ user.currency }}</label
+                    >
+                  </td>
+                </tr>
+              </table>
+            </div>
             {% endif %}
-          </table>
-        </form>
+          </div>
+
+          <div class="center-div">
+            <!-- Adding funds to account -->
+            <form action="http://127.0.0.1:5000/addFunds" method="POST">
+              <table>
+                <h1 class="section-headline">Add funds</h1>
+                <tr>
+                  <td>
+                    <input
+                      type="number"
+                      min="1"
+                      name="amount"
+                      class="section__input"
+                      placeholder="1"
+                    />
+                  </td>
+                  <td style="position: relative;"><td style="position: absolute; left: 41%">RSD</td></td>
+                </tr>
+                <tr>
+                  <td style="text-align: right;"><button class="button button-section" type="submit">ADD</button></td>
+                </tr>
+              </table>
+            </form>
+
+            <br />
+            <br />
+            <br />
+
+            <div class="section__convert">
+              <h1 class="section-headline">Convert</h1>
+              <!-- Ovde se ubaci for i onda se ispise koje valute sve ima na racunu, njihov kurs sa dinarom -->
+              <p>1 EUR = 117.3 RSD</p>
+              <p>1 USD = 100.3 RSD</p>
+
+              <div>
+                <table>
+                  <tr>
+                    <td class="exchange">
+                      <input class="exchange__input" min="1" placeholder="1"/>
+                      <p>RSD => </p>
+                      <u> 1000 </u>
+                      <select class="exchange__input">
+                        <option value="email">USD</option>
+                        <option value="accountTransfer">EUR</option>
+                      </select>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-div">
+            <form action="http://127.0.0.1:5000/addFunds" method="POST">
+              <table>
+                <h1 class="section-headline">Transaction</h1>
+                <tr>
+                  <td>
+                    <select class="section__input input-sm">
+                      <option value="email">email</option>
+                      <option value="accountTransfer">account transfer</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input placeholder="Receiver" class="section__input input-md" type="text" name="destination" /></td>
+                </tr>
+                <tr class="test">
+                  <td>
+                    <label class="section__label">Amount: </label>
+                  </td>
+                  <td style="position: relative;">
+                    <td style="position: absolute; left: 69%; padding-top: 5px;">
+                      <input min="1" placeholder="1" class="section__input" type="text" name="destination" />
+                    </td>
+                  </td>
+                </tr>
+                <tr >
+                  <td  colspan="1" style="text-align: left;"><button class="button button-section" type="submit">ADD</button></td>
+                </tr>
+              </table>
+            </form>
+            <div>
+              <h1 class="section-headline">Transaction History</h1>
+              <div class="section__transaction">
+                <ul class="transaction">
+                  <li class="transaction-minus">
+                    29/09/2021 ---- SENT ---- 200$
+                  </li>
+                  <li class="transaction-addition">
+                    30/09/2021 ---- RECEIVED ---- 600$
+                  </li>
+                  <li class="transaction-addition">
+                    30/09/2021 ---- RECEIVED ---- 600$
+                  </li>
+                  <li class="transaction-addition">
+                    30/09/2021 ---- RECEIVED ---- 600$
+                  </li>
+                  <li class="transaction-addition">
+                    30/09/2021 ---- RECEIVED ---- 600$
+                  </li>
+                  <li class="transaction-addition">
+                    30/09/2021 ---- RECEIVED ---- 600$
+                  </li>
+                  <li class="transaction-minus">
+                    29/09/2021 ---- SENT ---- 200$
+                  </li>
+                  <li class="transaction-addition">
+                    30/09/2021 ---- RECEIVED ---- 600$
+                  </li>
+                  <li class="transaction-minus">
+                    29/09/2021 ---- SENT ---- 200$
+                  </li>
+                  <li class="transaction-addition">
+                    30/09/2021 ---- RECEIVED ---- 600$
+                  </li>
+                  <li class="transaction-minus">
+                    29/09/2021 ---- SENT ---- 200$
+                  </li>
+                  <li class="transaction-addition">
+                    30/09/2021 ---- RECEIVED ---- 600$
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      {% endif %} {% if user.verified != 0 %}
-      <div class="wrapper">
-        <h1 class="form__headline">Linked Card</h1>
-        <table>
-          <tr>
-            <td>
-              <label for="cardNum" class="form__label">Card number</label>
-            </td>
-            <td>
-              <label for="cardNum" class="form__label">{{card.cardNum}}</label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label for="owner" class="form__label">Owner</label>
-            </td>
-            <td>
-              <label for="owner" class="form__label">{{card.owner}}</label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label for="date" class="form__label">Expiration Date</label>
-            </td>
-            <td>
-              <label for="date" class="form__label">{{card.expDate}}</label>
-            </td>
-          </tr>
-        </table>
-      </div>
-      <!-- Adding funds to account -->
-      <form  action="http://127.0.0.1:5000/addFunds" method="POST">
-        <table>
-          <tr>
-            <td colspan="2"> Add funds to online account: </td>
-          </tr>
-          <tr>
-            <td>Amount: </td>
-            <td><input type="number" min="1" name="amount"></td>
-          </tr>
-          <tr>
-            <td>Currency: </td>
-            <td><input type="text" name="currency"></td>
-          </tr>
-          <tr>
-            <td><input type="submit" value="ADD"></td>
-          </tr>
-        </table>
-      </form>
-      {% endif %}
     </section>
   </body>
 </html>

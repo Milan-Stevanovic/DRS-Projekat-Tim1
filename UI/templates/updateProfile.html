@@ -10,32 +10,40 @@
   </head>
   <body>
     <header class="header">
-      <nav class="nav">
-        <div class="nav__left">
-          <ul class="nav__items">
-            <li class="nav__item"><a class="nav__link" href="/">Bank</a></li>
-          </ul>
-        </div>
-        <div class="nav__right">
-          <ul class="nav__items">
-            {% if session.user %}
-            <li class="nav__item"><a class="nav__link" href="/profile">{{ user.name }} {{ user.lastname }}</a></li>
-            <li class="nav__item"><a class="nav__link" href="/logout">Logout</a></li>
-            {% endif %}
-          </ul>
-        </div>
-      </nav>
+      <div class="wrapper">
+        <nav class="nav">
+          <div class="nav__left">
+            <ul class="nav__items">
+              <li class="nav__item"><a class="nav__link" href="/">Bank</a></li>
+            </ul>
+          </div>
+          <div class="nav__right">
+            <ul class="nav__items">
+              {% if session.user %}
+              <li class="nav__item">
+                <a class="nav__link" href="/profile"
+                  >{{ user.name }} {{ user.lastname }}</a
+                >
+              </li>
+              <li class="nav__item">
+                <a class="nav__link" href="/logout">Logout</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </nav>
+      </div>
     </header>
-    
+
     <!-- TODO: Separate code below to separate .js file -->
     <script>
       function mouseoverPass(obj) {
         var obj = document.getElementById('password');
-        obj.type = "text";
+        obj.type = 'text';
       }
       function mouseoutPass(obj) {
-          var obj = document.getElementById('password');
-        obj.type = "password";
+        var obj = document.getElementById('password');
+        obj.type = 'password';
       }
     </script>
 
@@ -96,7 +104,8 @@
                 name="password"
                 required
                 value="{{user.password}}"
-                onmouseover="mouseoverPass();" onmouseout="mouseoutPass();"
+                onmouseover="mouseoverPass();"
+                onmouseout="mouseoutPass();"
               />
             </td>
           </tr>

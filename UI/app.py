@@ -9,7 +9,7 @@ from urllib.request import Request, urlopen
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.secret_key = '98aw3qj3eq2390dq239'
-currency_dictionary
+
 
 @app.route('/')
 def index():

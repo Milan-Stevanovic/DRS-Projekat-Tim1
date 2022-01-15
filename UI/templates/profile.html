@@ -4,126 +4,118 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../static/styles/form.css">
+    <link rel="stylesheet" href="../static/styles/form.css" />
     <link rel="stylesheet" href="../static/styles/header.css" />
     <title>Index</title>
   </head>
   <body>
     <header class="header">
-      <nav class="nav">
-        <div class="nav__left">
-          <ul class="nav__items">
-            <li class="nav__item"><a class="nav__link" href="/">Bank</a></li>
-          </ul>
-        </div>
-        <div class="nav__right">
-          <ul class="nav__items">
-            {% if session.user %}
-            <!-- TODO: Save all user fields in sessino -->
-            <li class="nav__item"><a class="nav__link" href="/profile"> {{ user.name }} {{ user.lastname }} </a></li>
-            <li class="nav__item"><a class="nav__link" href="/logout">Logout</a></li>
-            {% endif %}
-          </ul>
-        </div>
-      </nav>
+      <div class="wrapper">
+        <nav class="nav">
+          <div class="nav__left">
+            <ul class="nav__items">
+              <li class="nav__item"><a class="nav__link" href="/">Bank</a></li>
+            </ul>
+          </div>
+          <div class="nav__right">
+            <ul class="nav__items">
+              {% if session.user %}
+              <!-- TODO: Save all user fields in sessino -->
+              <li class="nav__item">
+                <a class="nav__link" href="/profile">
+                  {{ user.name }} {{ user.lastname }}
+                </a>
+              </li>
+              <li class="nav__item">
+                <a class="nav__link" href="/logout">Logout</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </nav>
+      </div>
     </header>
-      
+
     <div class="wrapper">
       <h1 class="form__headline">Profile info</h1>
-      
-        
-    
-        <table>
-          <tr>
-            <td>
-              <label class="form__label" for="name">Name:</label>
-            </td>
-            <td>
-              <label class="form__label" name="name" >{{user.name}}</label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label class="form__label" for="lastname">Last name:</label>
-            </td>
-            <td>
-              <label class="form__label" name="lastname" >{{user.lastname}}</label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label class="form__label" for="email">Email:</label>
-            </td>
-            <td>
-              <label class="form__label"  for="email" >{{user.email}}</label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label class="form__label" for="password">Password:</label>
-            </td>
-            <td>
-              <label
-                class="form__label"
-                for="password">
-                {{user.password}}
-              </label>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label class="form__label" for="address">Address:</label>
-            </td>
-            <td>
-              <label class="form__label" for="address" >{{user.address}}</label>  
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label class="form__label" for="city">City:</label>
-            </td>
-            <td>
-              <label class="form__label" for="city">{{user.city}}</label>  
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label class="form__label" for="country">Country:</label>
-            </td>
-            <td>
-              <label class="form__label" for="country">{{user.country}}</label>  
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label class="form__label" for="phonNum">Phone Number:</label>
-            </td>
-            <td>
-              <label
-                class="form__label"
-                for="phonNum"
-              > {{user.phonNum}}</label> 
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label class="form__label" for="balance">Balance:</label>
-            </td>
-            <td>
-              <label class="form__label" name="balance" > {{ user.balance }} {{ user.currency }}</label>
-            </td>
-          </tr>
-          <tr>
-            <td class="button" colspan="2">
-              <a href = "http://127.0.0.1:5000/updateProfile"
-                class="form__input form__input--button"   
-              >Edit profile</a>
-            </td>
-          </tr>  
-              
-        </table>
-  
-  
+
+      <table>
+        <tr>
+          <td>
+            <label class="form__label" for="name">Name:</label>
+          </td>
+          <td>
+            <label class="form__label" name="name">{{user.name}}</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="form__label" for="lastname">Last name:</label>
+          </td>
+          <td>
+            <label class="form__label" name="lastname">{{user.lastname}}</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="form__label" for="email">Email:</label>
+          </td>
+          <td>
+            <label class="form__label" for="email">{{user.email}}</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="form__label" for="password">Password:</label>
+          </td>
+          <td>
+            <label class="form__label" for="password">
+              {{user.password}}
+            </label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="form__label" for="address">Address:</label>
+          </td>
+          <td>
+            <label class="form__label" for="address">{{user.address}}</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="form__label" for="city">City:</label>
+          </td>
+          <td>
+            <label class="form__label" for="city">{{user.city}}</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="form__label" for="country">Country:</label>
+          </td>
+          <td>
+            <label class="form__label" for="country">{{user.country}}</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="form__label" for="phonNum">Phone Number:</label>
+          </td>
+          <td>
+            <label class="form__label" for="phonNum"> {{user.phonNum}}</label>
+          </td>
+        </tr>
+        <tr>
+          <td class="button" colspan="2">
+            <a
+              href="http://127.0.0.1:5000/updateProfile"
+              class="form__input form__input--button"
+              >Edit profile</a
+            >
+          </td>
+        </tr>
+      </table>
     </div>
   </body>
-  </html>
+</html>
