@@ -6,10 +6,10 @@ import random
 from werkzeug.utils import redirect
 from urllib.request import Request, urlopen
 
+currency_dictionary = []
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.secret_key = '98aw3qj3eq2390dq239'
-
 
 @app.route('/')
 def index():
@@ -165,22 +165,13 @@ def updateProfileInfo():
         return render_template('profile.html')
 
 @app.route('/addFunds', methods = ['POST'])
-def addFunds(currency_dictionary : dict):
+def addFunds():
     _amount = request.form['amount']
-    _currency = (request.form['currency']).upper()
 
-    _user_currency = session['user']['currency']
-
-    # need fixing, Tanjas input is required!
-    if _user_currency == 'RSD':
-        _new_balance = float(_amount) + float(session['user']['balance'])
-    elif _user_currency == _currency:
-        _new_balance = float(_amount) / currency_dictionary[_user_currency] + float(session['user']['balance'])
-    else:
-        _new_balance = float(_amount) / currency_dictionary[_user_currency] + float(session['user']['balance'])
+    _new_balance = float(_amount) + float(session['user']['balance'])
 
     headers = {'Content-type' : 'application/json', 'Accept' : 'text/plain'}
-    body = json.dumps({'email' : session['user']['email'], 'new balance' : _new_balance, 'currency' : _currency})
+    body = json.dumps({'email' : session['user']['email'], 'new balance' : _new_balance, 'currency' : 'RSD'})
     req = requests.post("http://127.0.0.1:5001/api/addFunds", data = body, headers = headers)
 
     updateUserInSession(session['user']['email'])

@@ -217,6 +217,7 @@
             {% endif %}
           </div>
 
+          {% if user.verified != 0 %}
           <div class="center-div">
             <!-- Adding funds to account -->
             <form action="http://127.0.0.1:5000/addFunds" method="POST">
@@ -267,7 +268,7 @@
               </div>
             </div>
           </div>
-
+          
           <div class="right-div">
             <form action="http://127.0.0.1:5000/addFunds" method="POST">
               <table>
@@ -342,6 +343,7 @@
               </div>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </section>
