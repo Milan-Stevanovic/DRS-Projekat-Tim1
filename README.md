@@ -86,7 +86,7 @@ Model baze kao I tip baze (NoSQL, SQL) je proizvoljan.
 •	Deploy aplikacije na Heroku – gratis 5 poena (moguće samo ako je svih 6 tačaka implementirano)
   
 ___
-Milan Stevanvović PR128-2018
+Milan Stevanović PR128-2018
 
 Nevena Panić PR43-2018
 
