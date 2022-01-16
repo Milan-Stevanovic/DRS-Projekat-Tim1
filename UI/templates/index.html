@@ -270,19 +270,19 @@
           </div>
           
           <div class="right-div">
-            <form action="http://127.0.0.1:5000/addFunds" method="POST">
+            <form action="http://127.0.0.1:5000/initTransaction" method="POST">
               <table>
                 <h1 class="section-headline">Transaction</h1>
                 <tr>
                   <td>
                     <select class="section__input input-sm">
                       <option value="email">email</option>
-                      <option value="accountTransfer">account transfer</option>
+                      <option value="accountNumber">account number</option>
                     </select>
                   </td>
                 </tr>
                 <tr>
-                  <td><input placeholder="Receiver" class="section__input input-md" type="text" name="destination" /></td>
+                  <td><input placeholder="Receiver" class="section__input input-md" type="text" name="receiver" /></td>
                 </tr>
                 <tr class="test">
                   <td>
@@ -290,7 +290,12 @@
                   </td>
                   <td style="position: relative;">
                     <td style="position: absolute; left: 69%; padding-top: 5px;">
-                      <input min="1" placeholder="1" class="section__input" type="text" name="destination" />
+                      <input min="1" placeholder="1" class="section__input" type="text" name="amount" />
+                      <select name="transactionCurrency">
+                        {% for currency in currency_dictionary %}
+                          <option value="{{ currency }}">{{ currency }}</option>
+                        {% endfor %}
+                      </select>
                     </td>
                   </td>
                 </tr>

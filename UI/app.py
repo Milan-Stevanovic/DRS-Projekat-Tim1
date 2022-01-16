@@ -1,3 +1,5 @@
+from email import header
+from sqlite3 import Date
 from flask import Flask, render_template, request, json, session, jsonify
 from flask.helpers import url_for
 import requests
@@ -6,7 +8,7 @@ import random
 from werkzeug.utils import redirect
 from urllib.request import Request, urlopen
 
-currency_dictionary = []
+currency_dictionary = {}
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.secret_key = '98aw3qj3eq2390dq239'
@@ -14,13 +16,14 @@ app.secret_key = '98aw3qj3eq2390dq239'
 @app.route('/')
 def index():
     if 'user' in session:
+        currency_dictionary = refreshCurrencyList('RSD')
         if session['user']['verified'] != 0: #verifikovan
             # uzmi karticu
             headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
             body = json.dumps({'cardNum': session['user']['cardNum']})
             req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
             card = (req.json())
-            return render_template('index.html', user = session['user'], card = card)
+            return render_template('index.html', user = session['user'], card = card, currency_dictionary = currency_dictionary)
         else:
             return render_template('index.html', user = session['user'])
     return render_template('login.html')
@@ -41,7 +44,7 @@ def register():
         _balance = "0"
         _verified = 'False'
         _cardNum = "-1"
-        _currency = 'USD'
+        _currency = 'RSD'
         _accountNum = ''.join(random.choices(string.digits, k = 18))
         print(_accountNum)
 
@@ -96,6 +99,9 @@ def logout():
 
 @app.route('/linkCard', methods=['POST'])
 def linkCard():
+    currency_dictionary = refreshCurrencyList('USD')
+    _newBalance = currency_dictionary['RSD']*(-1)
+    print(_newBalance)
     _cardNum = request.form['cardNum']
     _owner = request.form['owner']
     _month = request.form['month']
@@ -115,7 +121,7 @@ def linkCard():
 
     # Update cardNum in 'user' table and insert new row in 'card' table
     headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
-    body = json.dumps({ 'email': session['user']['email'], 'cardNum' : _cardNum, 'owner' : _owner, 'expDate' : _expDate, 'securityCode' : _securityCode })
+    body = json.dumps({ 'email': session['user']['email'], 'cardNum' : _cardNum, 'owner' : _owner, 'expDate' : _expDate, 'securityCode' : _securityCode, 'balance' : _newBalance })
     requests.post("http://127.0.0.1:5001/api/linkCard", data = body, headers = headers)
 
     # User changed, update user in session
@@ -179,6 +185,22 @@ def addFunds():
     return redirect(url_for('index'))
 
 
+@app.route('/initTransaction', methods = ['POST'])
+def initTransaction():
+    _sender = session['user']['email']
+    _receiver = request.form['receiver']
+    _amount = request.form['amount']
+    _transactionCurrecny = request.form['transactionCurrency']
+    _date = Date.today().strftime("%y-%m-%d")
+    _state = "PROCESSING"
+
+    headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
+    body = json.dumps({'sender' : _sender, 'receiver' : _receiver, 'amount' : _amount, 'transactionCurrency' : _transactionCurrecny, "date" : _date, "state" : _state})
+    req = requests.post("http://127.0.0.1:5001/api/initTransaction", data = body, headers = headers)
+   
+    return redirect(url_for('index'))
+
+
 def updateUserInSession(email):
     # Get updated user and put it in session['user']
     headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
@@ -186,9 +208,11 @@ def updateUserInSession(email):
     req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
     session['user'] = (req.json())
 
-def refreshCurrencyList(currency_dictionary : dict, base_currency : str):
+def refreshCurrencyList(base_currency : str):
     # base currency is RSD
     req = requests.get("https://freecurrencyapi.net/api/v2/latest?apikey=57fbaed0-7177-11ec-a390-0d2dac4cb175&base_currency=" + base_currency)
-    currency_dictionary = (req.json())['data']
+    return (req.json())['data']
+
+
 
 app.run(port=5000, debug=True)

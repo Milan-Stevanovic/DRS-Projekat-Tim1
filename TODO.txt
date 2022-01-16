@@ -1,0 +1,2 @@
+1.users.py linija 135 treba dodati logiku za skidanje para sa racuna
+2.dodati response za addFunds i initTransaction u users.py (dodati obradu na UI)

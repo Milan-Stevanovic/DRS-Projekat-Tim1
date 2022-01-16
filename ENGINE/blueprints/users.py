@@ -1,3 +1,6 @@
+from msilib.schema import ControlEvent
+from os import stat
+from sqlite3 import Date
 from flask import Blueprint, request, json, jsonify, session
 import requests, flask
 from requests.api import get
@@ -84,7 +87,8 @@ def linkCard():
     _owner = content['owner']
     _expDate = content['expDate']
     _securityCode = content['securityCode']
-    linkCardWithUser(_email, _cardNum, _owner, _expDate, _securityCode)
+    _newBalance = content['balance']
+    linkCardWithUser(_email, _cardNum, _owner, _expDate, _securityCode, _newBalance)
     return {'message' : 'Card linked successfully!'}, 200
 
 @user_blueprint.route('/updateProfile', methods = ['POST'])
@@ -119,7 +123,18 @@ def addFunds():
     addFunds(_email, _new_balance, _currency)
 
 
+@user_blueprint.route('/initTransaction', methods = ['POST'])
+def initTransaction():
+    content = flask.request.json
+    _sender = content['sender']
+    _receiver = content['receiver']
+    _amount = content['amount']
+    _transactionCurrecny = content['transactionCurrency']
+    _date = content['date']
+    _state = content['state']
 
+    addTransaction(_sender, _receiver, _amount, _date, _transactionCurrecny, _state)
+    
 # ==========================================================================================================
 # ===================================== Functions for dataBase access ====================================== 
 # ==========================================================================================================
@@ -164,16 +179,23 @@ def getCard(cardNum : str) -> dict:
     cursor.close()
     return card
 
-def linkCardWithUser(email : str, cardNum : str, owner : str, expDate : str, securityCode : str):
+def linkCardWithUser(email : str, cardNum : str, owner : str, expDate : str, securityCode : str, balance : str):
     cursor = mysql.connection.cursor()
     cursor.execute(''' INSERT INTO card VALUES (%s, %s, %s, %s)''', (cardNum, owner, expDate, securityCode))
     mysql.connection.commit()
-    cursor.execute(''' UPDATE user SET cardNum = %s, verified = 1, balance = -1 WHERE email = %s''', (cardNum, email))
+    cursor.execute(''' UPDATE user SET cardNum = %s, verified = 1, balance = %s WHERE email = %s''', (cardNum, balance, email))
     mysql.connection.commit()
     cursor.close()
 
 def addFunds(email : str, new_balance : float, currency : str):
     cursor = mysql.connection.cursor()
     cursor.execute(''' UPDATE user SET balance = %s, currency = %s WHERE email = %s''', (new_balance, currency, email))
+    mysql.connection.commit()
+    cursor.close()
+
+
+def addTransaction(sender : str, receiver : str, amount : float, date : Date, currency : str, state : str):
+    cursor = mysql.connection.cursor()
+    cursor.execute(''' INSERT INTO transaction VALUES (%s, %s, %s, %s, %s, %s)''', (sender, receiver, amount, date, currency, state))
     mysql.connection.commit()
     cursor.close()
