@@ -9,21 +9,31 @@ from werkzeug.utils import redirect
 from urllib.request import Request, urlopen
 
 currency_dictionary = {}
+converted_balance = ""
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.secret_key = '98aw3qj3eq2390dq239'
 
+@app.before_first_request
+def getCurrencyList():
+    global currency_dictionary 
+    currency_dictionary = refreshCurrencyList('RSD')
+
 @app.route('/')
 def index():
     if 'user' in session:
-        currency_dictionary = refreshCurrencyList('RSD')
         if session['user']['verified'] != 0: #verifikovan
             # uzmi karticu
             headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
             body = json.dumps({'cardNum': session['user']['cardNum']})
             req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
             card = (req.json())
-            return render_template('index.html', user = session['user'], card = card, currency_dictionary = currency_dictionary)
+            transaction_history = getTransactionHistory()
+            return render_template('index.html', user = session['user'], 
+                                                 card = card, 
+                                                 currency_dictionary = currency_dictionary, 
+                                                 converted_balance = converted_balance,
+                                                 transaction_history = transaction_history)
         else:
             return render_template('index.html', user = session['user'])
     return render_template('login.html')
@@ -45,14 +55,11 @@ def register():
         _verified = 'False'
         _cardNum = "-1"
         _currency = 'RSD'
-        _accountNum = ''.join(random.choices(string.digits, k = 18))
-        print(_accountNum)
-
 
         headers = {'Content-type' : 'application/json','Accept': 'text/plain'}
         body = json.dumps({'name': _name, 'lastname':_lastname, 'email':_email, 'password':_password, 'address':_address, 
                            'city':_city, 'country':_country, 'phoneNum':_phoneNum, 'balance':_balance, 'verified':_verified,
-                           'cardNum':_cardNum, 'currency': _currency, 'accountNum' : _accountNum})
+                           'cardNum':_cardNum, 'currency': _currency})
         req = requests.post("http://127.0.0.1:5001/api/register", data = body, headers = headers)
 
         response = (req.json())
@@ -99,8 +106,9 @@ def logout():
 
 @app.route('/linkCard', methods=['POST'])
 def linkCard():
-    currency_dictionary = refreshCurrencyList('USD')
-    _newBalance = currency_dictionary['RSD']*(-1)
+    print('\n\nTEST\n')
+    print(currency_dictionary)
+    _newBalance = currency_dictionary['USD']*(-1)
     print(_newBalance)
     _cardNum = request.form['cardNum']
     _owner = request.form['owner']
@@ -200,6 +208,13 @@ def initTransaction():
    
     return redirect(url_for('index'))
 
+@app.route('/convert', methods = ['POST'])
+def convert():
+    _convertCurrency = request.form['convertCurrency']
+    global converted_balance
+    converted_balance = str(session['user']['balance'] / currency_dictionary[_convertCurrency]) + " " + _convertCurrency
+    return redirect(url_for('index'))
+
 
 def updateUserInSession(email):
     # Get updated user and put it in session['user']
@@ -210,9 +225,19 @@ def updateUserInSession(email):
 
 def refreshCurrencyList(base_currency : str):
     # base currency is RSD
+    # Converts every other currency in base currecy value
     req = requests.get("https://freecurrencyapi.net/api/v2/latest?apikey=57fbaed0-7177-11ec-a390-0d2dac4cb175&base_currency=" + base_currency)
-    return (req.json())['data']
+    currency_dict = (req.json())['data']
 
+    for key, value in currency_dict.items():
+        currency_dict[key] = 1 / value
 
+    return currency_dict
+
+def getTransactionHistory():
+    headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
+    body = json.dumps({'email': session['user']['email'], 'accountNum' : session['user']['accountNum']})
+    req = requests.get("http://127.0.0.1:5001/api/getTransactionHistory", data = body, headers = headers)
+    return req.json()
 
 app.run(port=5000, debug=True)

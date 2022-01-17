@@ -1,6 +1,9 @@
 from msilib.schema import ControlEvent
 from os import stat
+import random
 from sqlite3 import Date
+import string
+from subprocess import list2cmdline
 from flask import Blueprint, request, json, jsonify, session
 import requests, flask
 from requests.api import get
@@ -28,8 +31,13 @@ def register():
     _verified = content['verified']
     _cardNum = content['cardNum']
     _currency = content['currency']
-    _accountNum = content['accountNum']
     
+    # check if user with same account num exists
+    _accountNum = ''.join(random.choices(string.digits, k = 18))
+    while(accountNumExists(_accountNum)):
+        _accountNum = ''.join(random.choices(string.digits, k = 18))
+    
+    # check if user with same email exists
     if userExists(_email):
        retVal = {'message' : 'User already registered'}, 400
        return retVal
@@ -121,6 +129,8 @@ def addFunds():
     _currency = content['currency']
 
     addFunds(_email, _new_balance, _currency)
+    retVal = {'message' : 'Funds successfully added'}, 200
+    return retVal
 
 
 @user_blueprint.route('/initTransaction', methods = ['POST'])
@@ -134,6 +144,15 @@ def initTransaction():
     _state = content['state']
 
     addTransaction(_sender, _receiver, _amount, _date, _transactionCurrecny, _state)
+    retVal = {'message' : 'Transaction successfully initialized'}, 200
+    return retVal
+
+@user_blueprint.route('/getTransactionHistory', methods = ['GET'])
+def getTransactionHistory():
+    content = flask.request.json
+    _email = content['email']
+    _accountNum = content['accountNum']
+    return getTransactionHistoryFromDB(_email, _accountNum)
     
 # ==========================================================================================================
 # ===================================== Functions for dataBase access ====================================== 
@@ -142,6 +161,18 @@ def initTransaction():
 def userExists(email: str) -> bool :
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM user WHERE email = %s", (email,))
+    account = cursor.fetchone()
+    cursor.close()
+    if account:
+        return True
+    else:
+        return False
+
+# Check if user with same account number already exists 
+# We do this because account number is randomly generated and must be unique
+def accountNumExists(accNum : str) -> bool:
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM user WHERE accountNum = %s", (accNum,))
     account = cursor.fetchone()
     cursor.close()
     if account:
@@ -199,3 +230,10 @@ def addTransaction(sender : str, receiver : str, amount : float, date : Date, cu
     cursor.execute(''' INSERT INTO transaction VALUES (%s, %s, %s, %s, %s, %s)''', (sender, receiver, amount, date, currency, state))
     mysql.connection.commit()
     cursor.close()
+
+def getTransactionHistoryFromDB(email : str, accountNum : str) -> list:
+    cursor = mysql.connection.cursor()
+    cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s''', (email, email, accountNum,))
+    histroy = cursor.fetchall()
+    cursor.close()
+    return jsonify(histroy)

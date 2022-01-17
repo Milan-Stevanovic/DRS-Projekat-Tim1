@@ -246,25 +246,17 @@
             <br />
 
             <div class="section__convert">
-              <h1 class="section-headline">Convert</h1>
-              <!-- Ovde se ubaci for i onda se ispise koje valute sve ima na racunu, njihov kurs sa dinarom -->
-              <p>1 EUR = 117.3 RSD</p>
-              <p>1 USD = 100.3 RSD</p>
-
+              <h1 class="section-headline">Convert your balance to:</h1>
               <div>
-                <table>
-                  <tr>
-                    <td class="exchange">
-                      <input class="exchange__input" min="1" placeholder="1"/>
-                      <p>RSD => </p>
-                      <u> 1000 </u>
-                      <select class="exchange__input">
-                        <option value="email">USD</option>
-                        <option value="accountTransfer">EUR</option>
-                      </select>
-                    </td>
-                  </tr>
-                </table>
+                <form action="http://127.0.0.1:5000/convert" method="POST">
+                  <select class="exchange__input" style="width: 100px;" name="convertCurrency">
+                    {% for currency in currency_dictionary %}
+                      <option value="{{ currency }}">{{ currency }}</option>
+                    {% endfor %}
+                  </select>
+                  <p> {{ user.balance }} {{ user.currency }} = {{ converted_balance }}</p>
+                  <input type="submit" value="Convert"/>
+                </form>
               </div>
             </div>
           </div>
@@ -308,42 +300,19 @@
               <h1 class="section-headline">Transaction History</h1>
               <div class="section__transaction">
                 <ul class="transaction">
-                  <li class="transaction-minus">
-                    29/09/2021 ---- SENT ---- 200$
-                  </li>
-                  <li class="transaction-addition">
-                    30/09/2021 ---- RECEIVED ---- 600$
-                  </li>
-                  <li class="transaction-addition">
-                    30/09/2021 ---- RECEIVED ---- 600$
-                  </li>
-                  <li class="transaction-addition">
-                    30/09/2021 ---- RECEIVED ---- 600$
-                  </li>
-                  <li class="transaction-addition">
-                    30/09/2021 ---- RECEIVED ---- 600$
-                  </li>
-                  <li class="transaction-addition">
-                    30/09/2021 ---- RECEIVED ---- 600$
-                  </li>
-                  <li class="transaction-minus">
-                    29/09/2021 ---- SENT ---- 200$
-                  </li>
-                  <li class="transaction-addition">
-                    30/09/2021 ---- RECEIVED ---- 600$
-                  </li>
-                  <li class="transaction-minus">
-                    29/09/2021 ---- SENT ---- 200$
-                  </li>
-                  <li class="transaction-addition">
-                    30/09/2021 ---- RECEIVED ---- 600$
-                  </li>
-                  <li class="transaction-minus">
-                    29/09/2021 ---- SENT ---- 200$
-                  </li>
-                  <li class="transaction-addition">
-                    30/09/2021 ---- RECEIVED ---- 600$
-                  </li>
+                  {% for transaction in transaction_history %}
+                    {% if transaction.sender == user.email %}
+                      <li class="transaction-minus">
+                        {{ transaction.date }} {{ transaction.sender }} {{ transaction.receiver }} {{ transaction.amount }} {{ transaction.currency }} {{ transaction.state }}
+                      </li>
+                      {% else %}
+                      <li class="transaction-addition">
+                        {{ transaction.date }} {{ transaction.sender }} {{ transaction.receiver }} {{ transaction.amount }} {{ transaction.currency }} {{ transaction.state }}
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+
+                  
                 </ul>
               </div>
             </div>
