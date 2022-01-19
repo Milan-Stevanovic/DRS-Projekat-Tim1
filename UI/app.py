@@ -27,6 +27,7 @@ def index():
     if 'user' in session:
         if session['user']['verified'] != 0: #verifikovan
             # uzmi karticu
+            print(session['user'])
             headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
             body = json.dumps({'cardNum': session['user']['cardNum']})
             req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
@@ -39,7 +40,7 @@ def index():
                                                  transaction_history = transaction_history)
         else:
             return render_template('index.html', user = session['user'])
-    return render_template('login.html')
+    return render_template('index.html', user = '')
 
 @app.route('/register',methods = ['POST','GET'])
 def register():
@@ -69,10 +70,10 @@ def register():
         _message = response['message']
         _code = req.status_code
         if _code == 200:
-            updateUserInSession(session['user']['email'])
+            updateUserInSession(_email)
             
             return redirect(url_for('index'))
-        return render_template('register.html', message = _message)
+        return render_template('index.html')
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -103,9 +104,7 @@ def logout():
 
 @app.route('/linkCard', methods=['POST'])
 def linkCard():
-    print(currency_dictionary)
     _newBalance = currency_dictionary['USD']*(-1)
-    print(_newBalance)
     _cardNum = request.form['cardNum']
     _owner = request.form['owner']
     _month = request.form['month']
@@ -150,7 +149,7 @@ def updateProfileInfo():
         _address = request.form['address']
         _city = request.form['city']
         _country = request.form['country']
-        _phoneNum = request.form['phonNum']
+        _phoneNum = request.form['phoneNum']
         #ova 3 polja su zakomentarisana zato sto nisam stavio u formi da mogu da se mijenjaju
         #_balance = request.form['balance'] 
         #_verified = request.form['verified']
