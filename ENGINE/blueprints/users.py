@@ -152,7 +152,8 @@ def getTransactionHistory():
     content = flask.request.json
     _email = content['email']
     _accountNum = content['accountNum']
-    return getTransactionHistoryFromDB(_email, _accountNum)
+    _sortDate = content['sortDate']
+    return getTransactionHistoryFromDB(_email, _accountNum, _sortDate)
     
 # ==========================================================================================================
 # ===================================== Functions for dataBase access ====================================== 
@@ -227,13 +228,18 @@ def addFunds(email : str, new_balance : float, currency : str):
 
 def addTransaction(sender : str, receiver : str, amount : float, date : Date, currency : str, state : str):
     cursor = mysql.connection.cursor()
-    cursor.execute(''' INSERT INTO transaction VALUES (%s, %s, %s, %s, %s, %s)''', (sender, receiver, amount, date, currency, state))
+    cursor.execute(''' INSERT INTO transaction VALUES (NULL, %s, %s, %s, %s, %s, %s)''', (sender, receiver, amount, date, currency, state))
     mysql.connection.commit()
     cursor.close()
 
-def getTransactionHistoryFromDB(email : str, accountNum : str) -> list:
+def getTransactionHistoryFromDB(email : str, accountNum : str, sortDate : str) -> list:
     cursor = mysql.connection.cursor()
-    cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s''', (email, email, accountNum,))
+    if sortDate == 'ASC':
+        cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY date ASC''', (email, email, accountNum,))
+    elif sortDate == 'DESC':
+        cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY date DESC''', (email, email, accountNum,))
+    else:
+        cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s''', (email, email, accountNum,))
     histroy = cursor.fetchall()
     cursor.close()
     return jsonify(histroy)

@@ -299,6 +299,13 @@
             <div>
               <h1 class="section-headline">Transaction History</h1>
               <div class="section__transaction">
+              <form action="http://127.0.0.1:5000/sortByDateAsc" method="GET">
+              <button type="submit">Date ascending</button>
+              </form>
+              <form action="http://127.0.0.1:5000/sortByDateDesc" method="GET">
+              <button type="submit">Date descending</button>
+              </form>
+            </form>
                 <ul class="transaction">
                   {% for transaction in transaction_history %}
                     {% if transaction.sender == user.email %}

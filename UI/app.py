@@ -10,6 +10,7 @@ from urllib.request import Request, urlopen
 
 currency_dictionary = {}
 converted_balance = ""
+sortDate = ""
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.secret_key = '98aw3qj3eq2390dq239'
@@ -18,6 +19,8 @@ app.secret_key = '98aw3qj3eq2390dq239'
 def getCurrencyList():
     global currency_dictionary 
     currency_dictionary = refreshCurrencyList('RSD')
+    global sortDate
+    sortDate = 'ASC'
 
 @app.route('/')
 def index():
@@ -66,10 +69,7 @@ def register():
         _message = response['message']
         _code = req.status_code
         if _code == 200:
-            headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
-            body = json.dumps({'email': _email})
-            req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
-            session['user'] = (req.json())
+            updateUserInSession(session['user']['email'])
             
             return redirect(url_for('index'))
         return render_template('register.html', message = _message)
@@ -90,10 +90,7 @@ def login():
         _message = response['message']
         _code = req.status_code
         if _code == 200:
-            headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
-            body = json.dumps({'email': _email})
-            req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
-            session['user'] = (req.json())
+            updateUserInSession(_email)
             return redirect(url_for('index'))
         else:
             session['user'] = None
@@ -106,7 +103,6 @@ def logout():
 
 @app.route('/linkCard', methods=['POST'])
 def linkCard():
-    print('\n\nTEST\n')
     print(currency_dictionary)
     _newBalance = currency_dictionary['USD']*(-1)
     print(_newBalance)
@@ -133,10 +129,7 @@ def linkCard():
     requests.post("http://127.0.0.1:5001/api/linkCard", data = body, headers = headers)
 
     # User changed, update user in session
-    headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
-    body = json.dumps({'email': session['user']['email']})
-    req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
-    session['user'] = (req.json())
+    updateUserInSession(session['user']['email'])
 
     return redirect(url_for('index'))
 
@@ -168,10 +161,7 @@ def updateProfileInfo():
         req = requests.post("http://127.0.0.1:5001/api/updateProfile", data = body, headers = headers)
 
         # Get updated user and put it in session['user']
-        headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
-        body = json.dumps({'email': _email})
-        req = requests.get("http://127.0.0.1:5001/api/getUserFromDB", data = body, headers = headers)
-        session['user'] = (req.json())
+        updateUserInSession(session['user']['email'])
 
         _code = req.status_code
         if _code == 200:
@@ -215,6 +205,23 @@ def convert():
     converted_balance = str(session['user']['balance'] / currency_dictionary[_convertCurrency]) + " " + _convertCurrency
     return redirect(url_for('index'))
 
+@app.route('/sortByDateAsc', methods = ['GET'])
+def sortByDateAsc():
+    global sortDate
+    sortDate = 'ASC'
+    print('method call')
+    print(sortDate)
+    return redirect(url_for('index'))
+
+@app.route('/sortByDateDesc', methods = ['GET'])
+def sortByDateDesc():
+    global sortDate
+    sortDate = 'DESC'
+    print('method call')
+    print(sortDate)
+    return redirect(url_for('index'))
+
+#============================================================ REGULAR FUNCTIONS ============================================================ 
 
 def updateUserInSession(email):
     # Get updated user and put it in session['user']
@@ -224,11 +231,11 @@ def updateUserInSession(email):
     session['user'] = (req.json())
 
 def refreshCurrencyList(base_currency : str):
-    # base currency is RSD
-    # Converts every other currency in base currecy value
+    # base currency is RSD in our case
     req = requests.get("https://freecurrencyapi.net/api/v2/latest?apikey=57fbaed0-7177-11ec-a390-0d2dac4cb175&base_currency=" + base_currency)
     currency_dict = (req.json())['data']
 
+    # Converts every other currency in base currecy value
     for key, value in currency_dict.items():
         currency_dict[key] = 1 / value
 
@@ -236,7 +243,11 @@ def refreshCurrencyList(base_currency : str):
 
 def getTransactionHistory():
     headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
-    body = json.dumps({'email': session['user']['email'], 'accountNum' : session['user']['accountNum']})
+    global sortDate
+    print('\n\n\n\n\n\n\n\n TEST')
+    print(sortDate)
+    print('\n\n\n\n\n\n\n\n')
+    body = json.dumps({'email': session['user']['email'], 'accountNum' : session['user']['accountNum'], 'sortDate' : sortDate})
     req = requests.get("http://127.0.0.1:5001/api/getTransactionHistory", data = body, headers = headers)
     return req.json()
 
