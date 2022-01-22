@@ -17,6 +17,24 @@ const convertFundsBtn = document.querySelector('#convertFunds');
 const sendFundsBtn = document.querySelector('#sendFunds');
 const btnCloseModal = document.querySelectorAll('.btn--close-modal');
 const nav = document.querySelector('.nav');
+const searchInput = document.querySelector('#search-js');
+const transactionSection = document.querySelector('#transactions-js');
+const permanentTransactionList = document.querySelectorAll('.transaction-js');
+const selectedCurrency = document.querySelector('#convert-js');
+const currenctCurrency = document.querySelector('#currentCurrency');
+const currenctBalance = document.querySelector('#currentBalance');
+let convertedFunds = document.querySelector('#convertedFunds');
+let exchangeRates = {};
+
+if (currenctCurrency) {
+  fetch(
+    `https://freecurrencyapi.net/api/v2/latest?apikey=57fbaed0-7177-11ec-a390-0d2dac4cb175&base_currency=${currentCurrency.innerHTML}`
+  )
+    .then(response => response.json())
+    .then(data => {
+      exchangeRates = { ...data.data };
+    });
+}
 
 ///////////////////////////////////////
 // Modal window
@@ -113,3 +131,32 @@ const handleHover = function (e) {
 // Passing "argument" into handler
 nav.addEventListener('mouseover', handleHover.bind(0.5));
 nav.addEventListener('mouseout', handleHover.bind(1));
+
+// Search
+// Proveriti da li posle searcha i brisanja, treba uneti reset
+if (searchInput) {
+  searchInput.addEventListener('keyup', e => {
+    const searchResults = [];
+    permanentTransactionList.forEach(item => {
+      if (item.innerHTML.includes(e.target.value)) {
+        searchResults.push(item);
+      }
+    });
+
+    let htmlResult = '';
+    if (e.target.value !== '' && searchResults.length === 0)
+      transactionSection.innerHTML = '';
+    searchResults.forEach(item => {
+      htmlResult = `${htmlResult} ${item.outerHTML}`;
+      transactionSection.innerHTML = `${htmlResult}`;
+    });
+  });
+}
+// Convert
+if (selectedCurrency) {
+  selectedCurrency.addEventListener('change', e => {
+    let convertedAmount =
+      exchangeRates[selectedCurrency.value] * currentBalance.innerHTML;
+    convertedFunds.innerHTML = `${convertedAmount} ${selectedCurrency.value}`;
+  });
+}
