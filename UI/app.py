@@ -1,12 +1,8 @@
-from email import header
 from sqlite3 import Date
-from flask import Flask, render_template, request, json, session, jsonify
+from flask import Flask, render_template, request, json, session
 from flask.helpers import url_for
 import requests
-import string
-import random
 from werkzeug.utils import redirect
-from urllib.request import Request, urlopen
 
 currency_dictionary = {}
 converted_balance = ""
@@ -19,8 +15,6 @@ app.secret_key = '98aw3qj3eq2390dq239'
 def getCurrencyList():
     global currency_dictionary 
     currency_dictionary = refreshCurrencyList('RSD')
-    global sortDate
-    sortDate = 'ASC'
 
 @app.route('/')
 def index():
@@ -33,6 +27,7 @@ def index():
             req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
             card = (req.json())
             transaction_history = getTransactionHistory()
+            updateUserInSession(session['user']['email'])
             return render_template('index.html', user = session['user'], 
                                                  card = card, 
                                                  currency_dictionary = currency_dictionary, 
@@ -192,7 +187,7 @@ def initTransaction():
     _state = "PROCESSING"
 
     headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
-    body = json.dumps({'sender' : _sender, 'receiver' : _receiver, 'amount' : _amount, 'transactionCurrency' : _transactionCurrecny, "date" : _date, "state" : _state})
+    body = json.dumps({'sender' : _sender, 'receiver' : _receiver, 'amount' : _amount, 'transactionCurrency' : _transactionCurrecny, "date" : _date, "state" : _state, "rsdEquivalent" : float(_amount) * currency_dictionary[_transactionCurrecny]})
     req = requests.post("http://127.0.0.1:5001/api/initTransaction", data = body, headers = headers)
    
     return redirect(url_for('index'))
@@ -243,9 +238,6 @@ def refreshCurrencyList(base_currency : str):
 def getTransactionHistory():
     headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
     global sortDate
-    print('\n\n\n\n\n\n\n\n TEST')
-    print(sortDate)
-    print('\n\n\n\n\n\n\n\n')
     body = json.dumps({'email': session['user']['email'], 'accountNum' : session['user']['accountNum'], 'sortDate' : sortDate})
     req = requests.get("http://127.0.0.1:5001/api/getTransactionHistory", data = body, headers = headers)
     return req.json()

@@ -252,12 +252,14 @@
           {% for transaction in transaction_history %} {% if transaction.sender
           == user.email %}
           <li class="section__list--item sent transaction-js">
+            {{ transaction.ID }}
             {{ transaction.date }} {{ transaction.sender }} {{
             transaction.receiver }} {{ transaction.amount }} {{
             transaction.currency }} {{ transaction.state }}
           </li>
           {% else %}
           <li class="section__list--item received transaction-js">
+            {{ transaction.ID }}
             {{ transaction.date }} {{ transaction.sender }} {{
             transaction.receiver }} {{ transaction.amount }} {{
             transaction.currency }} {{ transaction.state }}

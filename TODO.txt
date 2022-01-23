@@ -1,4 +1,3 @@
-1. users.py linija 135 treba dodati logiku za skidanje para sa racuna
-2. Moramo paziti da zabranimo da je kolicina novca u transakciji 0 i da saljemo sami sebi pare.
-3. Treba da se dodaju thread-ovi i process-i.
-4. Treba da se odradi sort i search istorije transakcije.
+1. Moramo paziti da zabranimo da je kolicina novca u transakciji 0 i da saljemo sami sebi pare.
+2. Treba da se dodaju thread-ovi i process-i. 
+   ^ DONE) Dodat thread...

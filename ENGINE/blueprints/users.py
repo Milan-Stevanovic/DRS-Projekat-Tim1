@@ -1,13 +1,13 @@
-from msilib.schema import ControlEvent
-from os import stat
+import imp
+import multiprocessing
 import random
 from sqlite3 import Date
 import string
-from subprocess import list2cmdline
-from flask import Blueprint, request, json, jsonify, session
-import requests, flask
-from requests.api import get
-from werkzeug.wrappers import response
+import threading
+from time import sleep
+from flask import Blueprint, jsonify, session
+import flask
+import MySQLdb
 
 user_blueprint = Blueprint('user_blueprint', __name__)
  
@@ -111,11 +111,6 @@ def updateProfile():
     _country = content['country']
     _phoneNum = content['phoneNum']   
     
-    #ista prica kao na ui dijelu   
-    #_balance = content['balance']
-    #_verified = content['verified']
-    #_cardNum = content['cardNum']
-    
     updateUser(_name, _lastname, _email, _password, _address, _city, _country, _phoneNum)
     retVal = {'message' : 'User info successfully updated'}, 200
 
@@ -136,14 +131,20 @@ def addFunds():
 @user_blueprint.route('/initTransaction', methods = ['POST'])
 def initTransaction():
     content = flask.request.json
+    _id = getLastTransactionIndex()
     _sender = content['sender']
     _receiver = content['receiver']
     _amount = content['amount']
     _transactionCurrecny = content['transactionCurrency']
     _date = content['date']
     _state = content['state']
+    _rsdEquivalent = content['rsdEquivalent']
 
-    addTransaction(_sender, _receiver, _amount, _date, _transactionCurrecny, _state)
+    addTransaction(_id, _sender, _receiver, _amount, _date, _transactionCurrecny, _state)
+
+    thread = threading.Thread(target=transactionThread, args=(_id, _sender, _receiver, _rsdEquivalent,))
+    thread.start()
+
     retVal = {'message' : 'Transaction successfully initialized'}, 200
     return retVal
 
@@ -214,7 +215,6 @@ def getCard(cardNum : str) -> dict:
 def linkCardWithUser(email : str, cardNum : str, owner : str, expDate : str, securityCode : str, balance : str):
     cursor = mysql.connection.cursor()
     cursor.execute(''' INSERT INTO card VALUES (%s, %s, %s, %s)''', (cardNum, owner, expDate, securityCode))
-    mysql.connection.commit()
     cursor.execute(''' UPDATE user SET cardNum = %s, verified = 1, balance = %s WHERE email = %s''', (cardNum, balance, email))
     mysql.connection.commit()
     cursor.close()
@@ -226,9 +226,9 @@ def addFunds(email : str, new_balance : float, currency : str):
     cursor.close()
 
 
-def addTransaction(sender : str, receiver : str, amount : float, date : Date, currency : str, state : str):
+def addTransaction(id : int, sender : str, receiver : str, amount : float, date : Date, currency : str, state : str):
     cursor = mysql.connection.cursor()
-    cursor.execute(''' INSERT INTO transaction VALUES (NULL, %s, %s, %s, %s, %s, %s)''', (sender, receiver, amount, date, currency, state))
+    cursor.execute(''' INSERT INTO transaction VALUES (%s, %s, %s, %s, %s, %s, %s)''', (id, sender, receiver, amount, date, currency, state))
     mysql.connection.commit()
     cursor.close()
 
@@ -239,7 +239,49 @@ def getTransactionHistoryFromDB(email : str, accountNum : str, sortDate : str) -
     elif sortDate == 'DESC':
         cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY date DESC''', (email, email, accountNum,))
     else:
-        cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s''', (email, email, accountNum,))
+        cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY ID ASC''', (email, email, accountNum,))
     histroy = cursor.fetchall()
     cursor.close()
     return jsonify(histroy)
+
+def getLastTransactionIndex(): 
+    cursor = mysql.connection.cursor()
+    cursor.execute(''' SELECT ID FROM transaction ORDER BY ID DESC ''')
+    response = cursor.fetchone()
+    cursor.close()
+    if response:
+        id = response['ID'] + 1
+    else:
+        id = 0
+    return id
+
+
+def transactionThread(id, senderEmail, receiver, rsdEquivalent):
+    print('Transaction ', id, ' thread started ')
+    sleep(120) # zadato zadatkom 120s (2 min)
+    # otvaranje nove konekcije u threadu
+    mydb1 = MySQLdb.connect(host="localhost", 
+                        user="root", 
+                        passwd="", 
+                        db="bank")
+    cursor = mydb1.cursor()
+
+    cursor.execute(''' SELECT balance FROM user WHERE email = %s ''', (senderEmail,))
+    response = cursor.fetchone()
+    cursor.close()
+    senderAccountBalance = float(response[0])
+
+    
+    cursor = mydb1.cursor()
+    if senderAccountBalance < rsdEquivalent:
+        # Transaction Fail (No money)
+        cursor.execute(''' UPDATE transaction SET state = %s WHERE ID = %s''', ('FAIL', id,))
+        print('\nTransaction ', id, ' Fail')
+    else:
+        # Transcation Success (Big cash money)
+        cursor.execute(''' UPDATE transaction SET state = %s WHERE ID = %s''', ('SUCCESS', id,))
+        cursor.execute(''' UPDATE user SET balance = balance - %s WHERE email = %s''', (rsdEquivalent, senderEmail,))
+        cursor.execute(''' UPDATE user SET balance = balance + %s WHERE email = %s OR accountNum = %s''', (rsdEquivalent, receiver, receiver,))
+        print('\nTransaction ', id, ' Success')
+    mydb1.commit()
+    cursor.close()
