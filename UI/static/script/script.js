@@ -1,11 +1,14 @@
 'use strict';
 
+// Modal
 const modal1 = document.querySelector('#modal1');
 const modal2 = document.querySelector('#modal2');
 const modal3 = document.querySelector('#modal3');
 const modal4 = document.querySelector('#modal4');
 const modal5 = document.querySelector('#modal5');
 const overlay = document.querySelector('.overlay');
+
+// Forms
 const signOutForm = document.querySelector('#signoutForm');
 const profileForm = document.querySelector('#profileForm');
 const signInBtn = document.querySelector('#signin');
@@ -16,13 +19,21 @@ const addFundsBtn = document.querySelector('#addFunds');
 const convertFundsBtn = document.querySelector('#convertFunds');
 const sendFundsBtn = document.querySelector('#sendFunds');
 const btnCloseModal = document.querySelectorAll('.btn--close-modal');
+
+// Nav bar
 const nav = document.querySelector('.nav');
+
+// Transaction part
 const searchInput = document.querySelector('#search-js');
 const transactionSection = document.querySelector('#transactions-js');
 const permanentTransactionList = document.querySelectorAll('.transaction-js');
+
+// Actions of user
 const selectedCurrency = document.querySelector('#convert-js');
 const currenctCurrency = document.querySelector('#currentCurrency');
 const currenctBalance = document.querySelector('#currentBalance');
+
+// Helping variables
 let convertedFunds = document.querySelector('#convertedFunds');
 let exchangeRates = {};
 
@@ -40,7 +51,6 @@ if (currenctCurrency) {
 // Modal window
 
 const openModal = function (modal) {
-  const e = window.event;
   modal.hidden = false;
   overlay.hidden = false;
 };
@@ -55,6 +65,7 @@ const closeModal = function () {
 };
 
 ////////////////////////////////////////
+// Form section is not implemented in the final solution
 if (signUpBtn) {
   signUpBtn.forEach(btn =>
     btn.addEventListener('click', openModal.bind(this, modal1))
@@ -74,6 +85,7 @@ if (profileBtn) {
 }
 
 /////////////////////////
+// Modal Buttons
 if (signInBtn) {
   signInBtn.addEventListener('click', openModal.bind(this, modal2));
 }
@@ -90,26 +102,20 @@ if (sendFundsBtn) {
 btnCloseModal.forEach(btn => btn.addEventListener('click', closeModal));
 
 if (overlay) {
-  overlay.addEventListener('click', e => {
-    if (!modal1.hidden) closeModal();
-    else if (!modal2.hidden) closeModal();
-    else if (!modal3.hidden) closeModal();
-    else if (!modal4.hidden) closeModal();
-    else if (!modal5.hidden) closeModal();
-  });
+  overlay.addEventListener('click', closeModal);
 }
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && !modal1.hidden) {
-    closeModal(modal1);
+    closeModal();
   } else if (e.key === 'Escape' && !modal2.hidden) {
-    closeModal(modal2);
+    closeModal();
   } else if (e.key === 'Escape' && !modal3.hidden) {
-    closeModal(modal3);
+    closeModal();
   } else if (e.key === 'Escape' && !modal4.hidden) {
-    closeModal(modal4);
+    closeModal();
   } else if (e.key === 'Escape' && !modal5.hidden) {
-    closeModal(modal5);
+    closeModal();
   }
 });
 
@@ -133,7 +139,6 @@ nav.addEventListener('mouseover', handleHover.bind(0.5));
 nav.addEventListener('mouseout', handleHover.bind(1));
 
 // Search
-// Proveriti da li posle searcha i brisanja, treba uneti reset
 if (searchInput) {
   searchInput.addEventListener('keyup', e => {
     const searchResults = [];
@@ -144,14 +149,17 @@ if (searchInput) {
     });
 
     let htmlResult = '';
-    if (e.target.value !== '' && searchResults.length === 0)
+    if (e.target.value !== '' && searchResults.length === 0) {
       transactionSection.innerHTML = '';
+    }
+
     searchResults.forEach(item => {
       htmlResult = `${htmlResult} ${item.outerHTML}`;
       transactionSection.innerHTML = `${htmlResult}`;
     });
   });
 }
+
 // Convert
 if (selectedCurrency) {
   selectedCurrency.addEventListener('change', e => {

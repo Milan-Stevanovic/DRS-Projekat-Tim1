@@ -85,14 +85,13 @@ def login():
         req = requests.post("http://127.0.0.1:5001/api/login",data = body,headers = headers)
 
         response = (req.json())
-        _message = response['message']
         _code = req.status_code
         if _code == 200:
             updateUserInSession(_email)
             return redirect(url_for('index'))
         else:
             session['user'] = None
-            return render_template('login.html', message = _message)
+            return render_template('index.html', user = '')
 
 @app.route('/logout')
 def logout():

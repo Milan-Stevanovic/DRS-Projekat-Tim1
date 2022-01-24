@@ -180,7 +180,7 @@ def getCard(cardNum : str) -> dict:
 def linkCardWithUser(email : str, cardNum : str, owner : str, expDate : str, securityCode : str, balance : str):
     cursor = mysql.connection.cursor()
     cursor.execute(''' INSERT INTO card VALUES (%s, %s, %s, %s)''', (cardNum, owner, expDate, securityCode))
-    cursor.execute(''' UPDATE user SET cardNum = %s, verified = 1, balance = %s WHERE email = %s''', (cardNum, balance, email))
+    cursor.execute(''' UPDATE user SET cardNum = %s, verified = 1, balance = balance - %s WHERE email = %s''', (cardNum, balance, email))
     mysql.connection.commit()
     cursor.close()
 

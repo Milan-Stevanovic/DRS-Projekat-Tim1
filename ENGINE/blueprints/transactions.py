@@ -89,7 +89,7 @@ def getLastTransactionIndex():
 
 def transactionThread(id, sender, receiver, amount, date, transactionCurrecny, state, rsdEquivalent):
     print('Transaction ', id, ' thread started ')
-    sleep(120) # zadato zadatkom 120s (2 min)
+    sleep(5) # zadato zadatkom 120s (2 min)
 
     transaction = Transaction(id, sender, receiver, amount, date, transactionCurrecny, state, rsdEquivalent)
     queue.put(transaction)

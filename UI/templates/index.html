@@ -131,7 +131,7 @@
                     name="year"
                     type="number"
                     max="99"
-                    min="1"
+                    min="20"
                     required
                     placeholder="YY"
                   />
@@ -245,7 +245,7 @@
                 <option value="amount DESC">Amount</option>
               </optgroup>
             </select>
-            <input type="submit" value="Sort" style="width: 100px"/>
+            <input type="submit" value="Sort" style="width: 100px" />
           </form>
         </div>
         <div class="modal__form">
@@ -256,19 +256,23 @@
       <br />
       <div class="section__content">
         <ul id="transactions-js" class="section__list">
-          {% for transaction in transaction_history %} {% if transaction.sender
-          == user.email %}
+          {% for transaction in transaction_history %} {% if transaction.state
+          == "FAIL" %}
           <li class="section__list--item sent transaction-js">
-            {{ transaction.ID }}
-            {{ transaction.date }} {{ transaction.sender }} {{
-            transaction.receiver }} {{ transaction.amount }} {{
+            {{ transaction.ID }} {{ transaction.date }} {{ transaction.sender }}
+            {{ transaction.receiver }} {{ transaction.amount }} {{
             transaction.currency }} {{ transaction.state }}
           </li>
-          {% else %}
+          {% elif transaction.state == "SUCCESS" %}
           <li class="section__list--item received transaction-js">
-            {{ transaction.ID }}
-            {{ transaction.date }} {{ transaction.sender }} {{
-            transaction.receiver }} {{ transaction.amount }} {{
+            {{ transaction.ID }} {{ transaction.date }} {{ transaction.sender }}
+            {{ transaction.receiver }} {{ transaction.amount }} {{
+            transaction.currency }} {{ transaction.state }}
+          </li>
+          {% elif transaction.state == "PROCESSING" %}
+          <li class="section__list--item processing transaction-js">
+            {{ transaction.ID }} {{ transaction.date }} {{ transaction.sender }}
+            {{ transaction.receiver }} {{ transaction.amount }} {{
             transaction.currency }} {{ transaction.state }}
           </li>
           {% endif %} {% endfor %}
