@@ -231,15 +231,20 @@
       <h1 class="section-headline">Transaction History</h1>
       <br />
       <div class="section__transaction">
-        <form action="http://127.0.0.1:5000/sortByDateAsc" method="GET">
-          <button class="btn btn--show-modal" type="submit">
-            Date ascending
-          </button>
-        </form>
-        <form action="http://127.0.0.1:5000/sortByDateDesc" method="GET">
-          <button class="btn btn--show-modal" type="submit">
-            Date descending
-          </button>
+        <form action="http://127.0.0.1:5000/sort" method="post">
+          <select name="sortType">
+            <optgroup label="Ascending">
+              <option value="ID ASC">ID</option>
+              <option value="date ASC">Date</option>
+              <option value="amount ASC">Amount</option>
+            </optgroup>
+            <optgroup label="Descending">
+              <option value="ID DESC">ID</option>
+              <option value="date DESC">Date</option>
+              <option value="amount DESC">Amount</option>
+            </optgroup>
+          </select>
+          <input type="submit" value="Sort" style="width: 100px"/>
         </form>
         <div class="modal__form">
           <label>Search</label>
@@ -265,14 +270,6 @@
             transaction.currency }} {{ transaction.state }}
           </li>
           {% endif %} {% endfor %}
-          <!-- <li class="section__list--item sent">
-            23/09/2021 ----------------------- Sent to: dummy@gmail.com
-            ------------------------ USD 234.00 -------------------- Pending
-          </li>
-          <li class="section__list--item received">
-            23/09/2021 -------------------- Received from: dummy@gmail.com
-            -------------------- USD 234.00 -------------------- Pending
-          </li> -->
         </ul>
       </div>
     </section>

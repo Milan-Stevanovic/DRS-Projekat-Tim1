@@ -153,8 +153,8 @@ def getTransactionHistory():
     content = flask.request.json
     _email = content['email']
     _accountNum = content['accountNum']
-    _sortDate = content['sortDate']
-    return getTransactionHistoryFromDB(_email, _accountNum, _sortDate)
+    _sortFilter = content['sortFilter']
+    return getTransactionHistoryFromDB(_email, _accountNum, _sortFilter)
     
 # ==========================================================================================================
 # ===================================== Functions for dataBase access ====================================== 
@@ -232,12 +232,25 @@ def addTransaction(id : int, sender : str, receiver : str, amount : float, date 
     mysql.connection.commit()
     cursor.close()
 
-def getTransactionHistoryFromDB(email : str, accountNum : str, sortDate : str) -> list:
+def getTransactionHistoryFromDB(email : str, accountNum : str, sortFilter : str) -> list:
     cursor = mysql.connection.cursor()
-    if sortDate == 'ASC':
-        cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY date ASC''', (email, email, accountNum,))
-    elif sortDate == 'DESC':
-        cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY date DESC''', (email, email, accountNum,))
+    if sortFilter != '':
+        sortParts = sortFilter.split(' ')
+        if sortParts[0] == 'date':
+            if sortParts[1] == 'DESC':
+                cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY date DESC''', (email, email, accountNum,))
+            else:
+                cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY date ASC''', (email, email, accountNum,))
+        elif sortParts[0] == 'amount':
+            if sortParts[1] == 'DESC':
+                cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY amount DESC''', (email, email, accountNum,))
+            else:
+                cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY amount ASC''', (email, email, accountNum,))
+        else:
+            if sortParts[1] == 'DESC':
+                cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY ID DESC''', (email, email, accountNum,))
+            else:
+                cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY ID ASC''', (email, email, accountNum,))
     else:
         cursor.execute(''' SELECT * FROM transaction WHERE sender = %s OR receiver = %s OR receiver = %s ORDER BY ID ASC''', (email, email, accountNum,))
     histroy = cursor.fetchall()

@@ -6,7 +6,7 @@ from werkzeug.utils import redirect
 
 currency_dictionary = {}
 converted_balance = ""
-sortDate = ""
+sortFilter = ""
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.secret_key = '98aw3qj3eq2390dq239'
@@ -21,13 +21,15 @@ def index():
     if 'user' in session:
         if session['user']['verified'] != 0: #verifikovan
             # uzmi karticu
-            print(session['user'])
+            # print(session['user'])
             headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
             body = json.dumps({'cardNum': session['user']['cardNum']})
             req = requests.get("http://127.0.0.1:5001/api/getUserCardFromDB", data = body, headers = headers)
             card = (req.json())
             transaction_history = getTransactionHistory()
             updateUserInSession(session['user']['email'])
+            global sortFilter
+            sortFilter = ''
             return render_template('index.html', user = session['user'], 
                                                  card = card, 
                                                  currency_dictionary = currency_dictionary, 
@@ -145,10 +147,6 @@ def updateProfileInfo():
         _city = request.form['city']
         _country = request.form['country']
         _phoneNum = request.form['phoneNum']
-        #ova 3 polja su zakomentarisana zato sto nisam stavio u formi da mogu da se mijenjaju
-        #_balance = request.form['balance'] 
-        #_verified = request.form['verified']
-        #_cardNum = request.form['cardNum']
         
         headers = {'Content-type' : 'application/json', 'Accept' : 'text/plain'}
         body = json.dumps({'name' : _name, 'lastname' : _lastname, 'email' : _email, 'password' : _password, 'address' : _address, 'city' : _city, 'country' : _country, 'phoneNum' : _phoneNum})
@@ -199,20 +197,12 @@ def convert():
     converted_balance = str(session['user']['balance'] / currency_dictionary[_convertCurrency]) + " " + _convertCurrency
     return redirect(url_for('index'))
 
-@app.route('/sortByDateAsc', methods = ['GET'])
-def sortByDateAsc():
-    global sortDate
-    sortDate = 'ASC'
-    print('method call')
-    print(sortDate)
-    return redirect(url_for('index'))
+#============================================================== SORT FUNCTIONS ==============================================================
 
-@app.route('/sortByDateDesc', methods = ['GET'])
-def sortByDateDesc():
-    global sortDate
-    sortDate = 'DESC'
-    print('method call')
-    print(sortDate)
+@app.route('/sort', methods = ['GET', 'POST'])
+def sort():
+    global sortFilter
+    sortFilter = request.form['sortType']
     return redirect(url_for('index'))
 
 #============================================================ REGULAR FUNCTIONS ============================================================ 
@@ -237,8 +227,8 @@ def refreshCurrencyList(base_currency : str):
 
 def getTransactionHistory():
     headers = {'Content-type' : 'application/json', 'Accept': 'text/plain'}
-    global sortDate
-    body = json.dumps({'email': session['user']['email'], 'accountNum' : session['user']['accountNum'], 'sortDate' : sortDate})
+    global sortFilter
+    body = json.dumps({'email': session['user']['email'], 'accountNum' : session['user']['accountNum'], 'sortFilter' : sortFilter})
     req = requests.get("http://127.0.0.1:5001/api/getTransactionHistory", data = body, headers = headers)
     return req.json()
 
