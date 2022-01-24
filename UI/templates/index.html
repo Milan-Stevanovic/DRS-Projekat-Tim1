@@ -231,21 +231,23 @@
       <h1 class="section-headline">Transaction History</h1>
       <br />
       <div class="section__transaction">
-        <form action="http://127.0.0.1:5000/sort" method="post">
-          <select name="sortType">
-            <optgroup label="Ascending">
-              <option value="ID ASC">ID</option>
-              <option value="date ASC">Date</option>
-              <option value="amount ASC">Amount</option>
-            </optgroup>
-            <optgroup label="Descending">
-              <option value="ID DESC">ID</option>
-              <option value="date DESC">Date</option>
-              <option value="amount DESC">Amount</option>
-            </optgroup>
-          </select>
-          <input type="submit" value="Sort" style="width: 100px"/>
-        </form>
+        <div class="modal__form sort__form">
+          <form action="http://127.0.0.1:5000/sort" method="post">
+            <select name="sortType">
+              <optgroup label="Ascending">
+                <option value="ID ASC">ID</option>
+                <option value="date ASC">Date</option>
+                <option value="amount ASC">Amount</option>
+              </optgroup>
+              <optgroup label="Descending">
+                <option value="ID DESC">ID</option>
+                <option value="date DESC">Date</option>
+                <option value="amount DESC">Amount</option>
+              </optgroup>
+            </select>
+            <input type="submit" value="Sort" style="width: 100px"/>
+          </form>
+        </div>
         <div class="modal__form">
           <label>Search</label>
           <input id="search-js" type="text" />

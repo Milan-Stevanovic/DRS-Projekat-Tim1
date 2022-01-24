@@ -583,3 +583,9 @@ h4 {
   flex-direction: row;
   justify-content: center;
 }
+
+.sort__form{
+  display:flex; 
+  justify-content: end; 
+  align-items: center;
+}
