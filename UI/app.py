@@ -100,7 +100,7 @@ def logout():
 
 @app.route('/linkCard', methods=['POST'])
 def linkCard():
-    _newBalance = currency_dictionary['USD']*(-1)
+    _newBalance = currency_dictionary['USD']
     _cardNum = request.form['cardNum']
     _owner = request.form['owner']
     _month = request.form['month']
